@@ -306,6 +306,11 @@
   <div class="modal-body">
     <input class="mp-search" id="mpSearch" placeholder="جستجوی مدل…" dir="ltr" />
     <div class="mp-list" id="mpList"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;border-top:1px solid var(--line);padding-top:12px">
+      <input class="mp-search" id="mpManual" placeholder="نام مدل را دستی وارد کن (مثلاً claude-sonnet-4-5)" dir="ltr" style="margin-bottom:0" />
+      <button class="btn sm" id="mpManualBtn">استفاده</button>
+    </div>
+    <div class="muted-note" style="margin-top:6px">اگر لیست مدل‌ها نیامد، نام مدل را دستی بزن و چت را امتحان کن.</div>
   </div>
 </div></div>
 
@@ -437,7 +442,17 @@ async function persistProfiles(){
 /* ---------- API ---------- */
 function baseV1(url){ url=url.trim().replace(/\/+$/,''); return url.replace(/\/v1$/,'') }
 function apiUrl(p,path){ return baseV1(p.url)+path }
-function endpoint(p,path){ const t=apiUrl(p,path); if(p&&p.proxy){ const px=p.proxy.trim(); return px.includes('{url}')?px.replace('{url}',encodeURIComponent(t)):px+t } return t }
+function endpoint(p,path){
+  const t=apiUrl(p,path);
+  if(p&&p.proxy){
+    const px=p.proxy.trim();
+    if(px.includes('{url}')) return px.replace('{url}',encodeURIComponent(t));
+    if(px.endsWith('=')) return px+encodeURIComponent(t);                                  // ...?url=
+    if(px.includes('?')) return px+(px.endsWith('&')||px.endsWith('?')?'':'&')+'url='+encodeURIComponent(t);
+    return px.replace(/\/+$/,'')+'/?url='+encodeURIComponent(t);                            // آدرس خام Worker → ?url= اضافه می‌شود
+  }
+  return t;
+}
 function authHeaders(p,extra){ const h=Object.assign({Authorization:'Bearer '+p.key},extra||{}); if(p&&p.proxy&&state.settings.proxyToken) h['X-Proxy-Token']=state.settings.proxyToken; return h }
 
 async function fetchModels(p){
@@ -685,6 +700,8 @@ $('#fPreset').onchange=e=>{ const v=e.target.value; if(v==='custom'){ $('#fName'
 $('#newChatBtn').onclick=newChat; $('#hambBtn').onclick=openSidebar; $('#scrim').onclick=closeSidebar;
 $('#modelBtn').onclick=openModelPicker; $('#closeModelBtn').onclick=()=>$('#modelModal').classList.remove('show');
 $('#mpSearch').addEventListener('input',e=>{ state.modelFilter=e.target.value; renderModelList(); });
+$('#mpManualBtn').onclick=()=>{ const m=$('#mpManual').value.trim(); if(!m){ toast('نام مدل را بنویس'); return } const p=activeProfile(); if(p){ p.models=Array.from(new Set([...(p.models||[]),m])); persistProfiles(); } pickModel(m); $('#mpManual').value=''; };
+$('#mpManual').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#mpManualBtn').click(); });
 $('#modelModal').addEventListener('click',e=>{ if(e.target.id==='modelModal') $('#modelModal').classList.remove('show') });
 $('#reloadModelsBtn').onclick=async()=>{ const p=activeProfile(); if(p){ await loadModels(p); renderModelLabel(); toast('مدل‌ها بروزرسانی شد') } };
 $('#chatSettingsBtn').onclick=()=>{ const d=$('#chatSettings'); d.classList.toggle('show'); $('#chatSettingsBtn').classList.toggle('on',d.classList.contains('show')); };
