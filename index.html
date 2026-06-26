@@ -314,6 +314,11 @@
         <div><div class="lbl">تم</div><div class="sub">ظاهر روشن یا تاریک</div></div>
         <div class="seg" id="themeSeg"><button data-theme-val="dark">تاریک</button><button data-theme-val="light">روشن</button></div>
       </div>
+      <div class="set-row" style="display:block">
+        <div class="lbl">CORS Proxy پیش‌فرض</div>
+        <div class="sub" style="margin-bottom:8px">برای سرورهای پشت WAF/CORS (مثل AgentRouter) استفاده می‌شود · <a id="workerSrc" href="cloudflare-worker.js" target="_blank" style="color:var(--accent)">سورس Worker</a> · <code>{url}</code> با آدرس مقصد جایگزین می‌شود</div>
+        <input id="setProxy" dir="ltr" placeholder="https://...workers.dev/?url={url}" style="width:100%;background:var(--bg3);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:9px 11px;outline:none;font-size:13px" />
+      </div>
       <div class="set-row">
         <div><div class="lbl">پشتیبان‌گیری</div><div class="sub">ذخیره‌ی همه‌ی سرویس‌ها و گفتگوها در یک فایل</div></div>
         <button class="btn ghost sm" id="exportAllBtn">دانلود بکاپ</button>
@@ -719,7 +724,7 @@ function applyTheme(t){
   document.querySelectorAll('#themeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.themeVal===t));
   const hl=$('#hljsTheme'); if(hl) hl.href='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/'+(t==='light'?'github':'github-dark')+'.min.css';
 }
-function openSettings(){ applyTheme(localStorage.getItem(LS.theme)||'dark'); $('#settingsModal').classList.add('show') }
+function openSettings(){ applyTheme(localStorage.getItem(LS.theme)||'dark'); $('#setProxy').value=state.settings.defaultProxy||''; $('#settingsModal').classList.add('show') }
 function closeSettings(){ $('#settingsModal').classList.remove('show') }
 function updateOnline(){ $('#offlineBanner').classList.toggle('show',!navigator.onLine) }
 
