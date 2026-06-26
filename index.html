@@ -297,8 +297,9 @@
       <div class="field"><label>نام دلخواه</label><input id="fName" placeholder="مثلاً AgentRouter" /></div>
       <div class="field"><label>آدرس سرور (Base URL)</label><input id="fUrl" placeholder="https://api.bluesminds.com" dir="ltr" /></div>
       <div class="field"><label>کلید وب‌سرویس (API Key)</label><input id="fKey" placeholder="sk-..." dir="ltr" type="password" /></div>
+      <div class="field"><label>CORS Proxy (اختیاری) <span style="color:var(--muted)">— برای سرورهایی که CORS نمی‌دهند</span></label><input id="fProxy" placeholder="https://proxy.example/?url={url}" dir="ltr" /></div>
       <div class="test-result" id="testResult"></div>
-      <div class="muted-note">آدرس را بدون <code>/v1</code> وارد کنید. کلید و آدرس فقط روی همین دستگاه ذخیره می‌شوند.</div>
+      <div class="muted-note">آدرس را بدون <code>/v1</code> وارد کنید. اگر پراکسی <code>{url}</code> داشته باشد، آدرس مقصد به‌صورت encode‌شده جایگزین می‌شود؛ وگرنه به ابتدای آدرس اضافه می‌شود. کلید/آدرس فقط روی همین دستگاه ذخیره می‌شوند.</div>
     </div>
     <div class="modal-foot"><button class="btn ghost sm" id="testBtn">تست اتصال</button><button class="btn sm" id="saveProfileBtn">ذخیره</button></div>
   </div>
@@ -346,7 +347,7 @@ function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show')
 function timeoutSignal(ms){ const c=new AbortController(); setTimeout(()=>c.abort(new DOMException('timeout','AbortError')),ms); return c.signal }
 
 const PRESETS = [
-  { name:'AgentRouter', url:'https://agentrouter.org', note:'⚠️ این سرور پشت فایروال WAF است و معمولاً از مرورگر کار نمی‌کند. کلید: agentrouter.org/console/token' },
+  { name:'AgentRouter', url:'https://agentrouter.org', note:'⚠️ این سرور پشت فایروال Aliyun WAF است؛ از مرورگر/وب‌اپ پاسخ API نمی‌دهد (صفحه‌ی تأیید برمی‌گرداند). راه‌حل قطعی: نسخه‌ی نیتیو (Tauri/Electron). کلید: agentrouter.org/console/token' },
   { name:'BluesMinds',  url:'https://api.bluesminds.com', note:'' }
 ];
 const SUGGESTIONS = ['یک تابع پایتون برای مرتب‌سازی سریع بنویس','تفاوت TCP و UDP را ساده توضیح بده','یک ایمیل حرفه‌ای برای پیگیری جلسه بنویس','۵ ایده برای پست اینستاگرام یک کافه بده'];
@@ -368,11 +369,16 @@ function activeProfile(){ return state.profiles.find(p=>p.id===state.activeId) |
 function currentConv(){ return state.convs.find(c=>c.id===state.currentConvId) || null }
 function baseV1(url){ url=url.trim().replace(/\/+$/,''); return url.replace(/\/v1$/,'') }
 function apiUrl(p, path){ return baseV1(p.url)+path }
+function endpoint(p, path){
+  const target=apiUrl(p,path);
+  if(p && p.proxy){ const px=p.proxy.trim(); return px.includes('{url}')? px.replace('{url}',encodeURIComponent(target)) : px+target; }
+  return target;
+}
 
 /* ---------- API ---------- */
 async function fetchModels(p){
   let r;
-  try{ r = await fetch(apiUrl(p,'/v1/models'),{headers:{Authorization:'Bearer '+p.key},signal:timeoutSignal(15000)}); }
+  try{ r = await fetch(endpoint(p,'/v1/models'),{headers:{Authorization:'Bearer '+p.key},signal:timeoutSignal(15000)}); }
   catch(e){ if(e.name==='AbortError') throw new Error('پاسخ نداد (timeout)'); throw new Error('عدم دسترسی به سرور (شبکه/CORS)'); }
   if(!r.ok) throw new Error('HTTP '+r.status+(r.status===401?' — کلید نامعتبر':''));
   const ct=r.headers.get('content-type')||''; const body=await r.text();
@@ -381,7 +387,7 @@ async function fetchModels(p){
   return (j.data||[]).map(m=>m.id).sort();
 }
 async function fetchBalance(p){
-  const tryGet=async path=>{ try{ const r=await fetch(apiUrl(p,path),{headers:{Authorization:'Bearer '+p.key},signal:timeoutSignal(12000)}); if(!r.ok) return null; const ct=r.headers.get('content-type')||''; if(!ct.includes('json')) return null; return await r.json(); }catch{ return null } };
+  const tryGet=async path=>{ try{ const r=await fetch(endpoint(p,path),{headers:{Authorization:'Bearer '+p.key},signal:timeoutSignal(12000)}); if(!r.ok) return null; const ct=r.headers.get('content-type')||''; if(!ct.includes('json')) return null; return await r.json(); }catch{ return null } };
   let sub=await tryGet('/dashboard/billing/subscription')||await tryGet('/v1/dashboard/billing/subscription');
   if(!sub) return null;
   const total=Number(sub.hard_limit_usd ?? sub.soft_limit_usd ?? 0);
@@ -390,7 +396,7 @@ async function fetchBalance(p){
   return { total, used, remaining: total-used };
 }
 async function streamChat(p, body, onDelta, onUsage, signal){
-  const r=await fetch(apiUrl(p,'/v1/chat/completions'),{method:'POST',
+  const r=await fetch(endpoint(p,'/v1/chat/completions'),{method:'POST',
     headers:{'Content-Type':'application/json',Authorization:'Bearer '+p.key},body:JSON.stringify(body),signal});
   if(!r.ok){ let msg='HTTP '+r.status; try{ const e=await r.json(); msg=e.error?.message||e.message||msg }catch{} throw new Error(msg); }
   const ct=r.headers.get('content-type')||'';
@@ -542,16 +548,16 @@ function openProfileModal(id){
   $('#testResult').className='test-result';
   const p=id?state.profiles.find(x=>x.id===id):null;
   fillPresetSelect(p?baseV1(p.url):'');
-  $('#fName').value=p?p.name:''; $('#fUrl').value=p?p.url:''; $('#fKey').value=p?p.key:'';
+  $('#fName').value=p?p.name:''; $('#fUrl').value=p?p.url:''; $('#fKey').value=p?p.key:''; $('#fProxy').value=p?(p.proxy||''):'';
   $('#profileModal').classList.add('show');
   setTimeout(()=>{ (p?$('#fKey'):$('#fPreset')).focus() },50);
 }
 function closeModal(){ $('#profileModal').classList.remove('show') }
 async function saveProfile(){
-  const name=$('#fName').value.trim()||'سرویس', url=$('#fUrl').value.trim(), key=$('#fKey').value.trim();
+  const name=$('#fName').value.trim()||'سرویس', url=$('#fUrl').value.trim(), key=$('#fKey').value.trim(), proxy=$('#fProxy').value.trim();
   if(!url||!key){ toast('آدرس و کلید الزامی است'); return }
-  if(state.editingProfileId){ const p=state.profiles.find(x=>x.id===state.editingProfileId); Object.assign(p,{name,url,key}); delete p.models; }
-  else state.profiles.push({id:uid(),name,url,key});
+  if(state.editingProfileId){ const p=state.profiles.find(x=>x.id===state.editingProfileId); Object.assign(p,{name,url,key,proxy}); delete p.models; }
+  else state.profiles.push({id:uid(),name,url,key,proxy});
   save(LS.profiles,state.profiles); closeModal(); renderProfiles();
   await selectProfile(state.editingProfileId||state.profiles[state.profiles.length-1].id);
   toast('ذخیره شد');
@@ -566,10 +572,10 @@ function delProfile(id){
   if(state.activeId) selectProfile(state.activeId); else { state.currentConvId=null; renderConvs(); renderModels(); renderTopInfo(); renderChat() }
 }
 async function testConnection(){
-  const url=$('#fUrl').value.trim(), key=$('#fKey').value.trim(), res=$('#testResult');
+  const url=$('#fUrl').value.trim(), key=$('#fKey').value.trim(), proxy=$('#fProxy').value.trim(), res=$('#testResult');
   if(!url||!key){ res.className='test-result err'; res.textContent='آدرس و کلید را وارد کنید'; return }
   res.className='test-result'; res.style.display='block'; res.textContent='در حال تست…';
-  try{ const models=await fetchModels({url,key}); res.className='test-result ok'; res.textContent=`اتصال موفق — ${models.length} مدل یافت شد`; }
+  try{ const models=await fetchModels({url,key,proxy}); res.className='test-result ok'; res.textContent=`اتصال موفق — ${models.length} مدل یافت شد`; }
   catch(e){ res.className='test-result err'; res.textContent='ناموفق: '+e.message; }
 }
 async function selectProfile(id){
