@@ -69,8 +69,10 @@ export default {
     // پاسخ را با هدرهای CORS و بدنه‌ی استریم برگردان
     const outHeaders = new Headers(resp.headers);
     for (const [k, v] of Object.entries(CORS)) outHeaders.set(k, v);
-    outHeaders.delete('content-security-policy');
-    return new Response(resp.body, { status: resp.status, headers: outHeaders });
+    // حذف هدرهایی که چون بدنه دیکد شده باعث خرابی/خالی‌شدن پاسخ می‌شوند
+    ['content-encoding', 'content-length', 'transfer-encoding', 'connection',
+     'content-security-policy', 'content-security-policy-report-only'].forEach(h => outHeaders.delete(h));
+    return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers: outHeaders });
   }
 };
 
