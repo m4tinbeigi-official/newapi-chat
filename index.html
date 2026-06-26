@@ -346,8 +346,10 @@ function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
 function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2400) }
 function timeoutSignal(ms){ const c=new AbortController(); setTimeout(()=>c.abort(new DOMException('timeout','AbortError')),ms); return c.signal }
 
+const DEFAULT_PROXY = 'https://agentrouter.m4tinbeigi.workers.dev/?url={url}';
+const WORKER_SOURCE = 'cloudflare-worker.js'; // لینک سورس Worker (روی همین سایت سرو می‌شود)
 const PRESETS = [
-  { name:'AgentRouter', url:'https://agentrouter.org', note:'⚠️ این سرور پشت فایروال Aliyun WAF است؛ از مرورگر/وب‌اپ پاسخ API نمی‌دهد (صفحه‌ی تأیید برمی‌گرداند). راه‌حل قطعی: نسخه‌ی نیتیو (Tauri/Electron). کلید: agentrouter.org/console/token' },
+  { name:'AgentRouter', url:'https://agentrouter.org', useProxy:true, note:'این سرور پشت فایروال WAF است؛ از طریق CORS Proxy رد می‌شود (به‌صورت خودکار پر شد). کلید: agentrouter.org/console/token' },
   { name:'BluesMinds',  url:'https://api.bluesminds.com', note:'' }
 ];
 const SUGGESTIONS = ['یک تابع پایتون برای مرتب‌سازی سریع بنویس','تفاوت TCP و UDP را ساده توضیح بده','یک ایمیل حرفه‌ای برای پیگیری جلسه بنویس','۵ ایده برای پست اینستاگرام یک کافه بده'];
@@ -356,7 +358,7 @@ let state = {
   profiles: load(LS.profiles, []),
   activeId: localStorage.getItem(LS.active) || null,
   convs: load(LS.convs, []),
-  settings: load(LS.settings, {temperature:0.7, maxTokens:0, topP:1}),
+  settings: load(LS.settings, {temperature:0.7, maxTokens:0, topP:1, defaultProxy:DEFAULT_PROXY}),
   currentConvId: null,
   editingProfileId: null,
   streaming: false,
