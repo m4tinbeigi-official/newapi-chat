@@ -8,174 +8,196 @@
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
 <link rel="apple-touch-icon" href="icons/icon-192.png" />
-<link rel="preconnect" href="https://cdn.jsdelivr.net" />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" />
+<link id="hljsTheme" rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/github-dark.min.css" />
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.5/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
 <style>
   :root, [data-theme="dark"]{
-    --bg:#0f1117; --bg2:#161a23; --bg3:#1e232e; --line:#2a313d;
-    --txt:#e7ebf2; --muted:#8b93a3; --accent:#5b8cff; --accent2:#3a6df0;
-    --green:#3ecf8e; --red:#ff6b6b; --yellow:#ffcc66; --code:#0b0e14;
-    --radius:14px; --shadow:0 6px 24px rgba(0,0,0,.35);
+    --bg:#0e1016; --bg2:#151924; --bg3:#1c2230; --bg4:#232a3a; --line:#2a313f;
+    --txt:#e8ecf4; --muted:#8b93a6; --accent:#6c9cff; --accent2:#3a6df0; --accent-soft:#6c9cff22;
+    --green:#3ecf8e; --red:#ff6b6b; --yellow:#ffcc66; --code:#0a0d14;
+    --radius:14px; --shadow:0 10px 40px rgba(0,0,0,.45);
+    --grad:linear-gradient(135deg,#6c9cff,#3a6df0);
   }
   [data-theme="light"]{
-    --bg:#f5f7fb; --bg2:#ffffff; --bg3:#eef1f7; --line:#d9dee8;
-    --txt:#1a1f2b; --muted:#6b7280; --accent:#3a6df0; --accent2:#3a6df0;
-    --green:#179e6b; --red:#d64545; --yellow:#b8860b; --code:#f0f2f7;
-    --shadow:0 6px 24px rgba(20,30,60,.14);
+    --bg:#f3f5fa; --bg2:#ffffff; --bg3:#eef1f7; --bg4:#e4e9f2; --line:#dbe0ea;
+    --txt:#161a24; --muted:#646c7e; --accent:#3a6df0; --accent2:#3a6df0; --accent-soft:#3a6df015;
+    --green:#179e6b; --red:#d64545; --yellow:#a9760a; --code:#f1f3f9;
+    --shadow:0 10px 40px rgba(30,45,80,.16);
+    --grad:linear-gradient(135deg,#5b8cff,#3a6df0);
   }
   *{box-sizing:border-box}
   html,body{height:100%;margin:0}
-  body{
-    font-family:"Vazirmatn","Segoe UI",Tahoma,system-ui,sans-serif;
-    background:var(--bg);color:var(--txt);
-    -webkit-font-smoothing:antialiased;overflow:hidden;
-  }
+  body{font-family:"Vazirmatn","Segoe UI",Tahoma,system-ui,sans-serif;background:var(--bg);color:var(--txt);
+    -webkit-font-smoothing:antialiased;overflow:hidden}
   button{font-family:inherit;cursor:pointer}
   input,select,textarea{font-family:inherit}
+  ::-webkit-scrollbar{width:9px;height:9px}
+  ::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:10px}
+  ::-webkit-scrollbar-thumb:hover{background:var(--muted)}
   .app{display:flex;height:100dvh;width:100%}
 
-  /* ---------- Sidebar ---------- */
-  .sidebar{
-    width:300px;min-width:300px;background:var(--bg2);border-inline-start:1px solid var(--line);
-    display:flex;flex-direction:column;transition:margin .25s ease;
-  }
-  .side-head{padding:16px;border-bottom:1px solid var(--line)}
-  .brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px}
-  .brand .logo{width:30px;height:30px;border-radius:8px;
-    background:linear-gradient(135deg,var(--accent),var(--accent2));
-    display:grid;place-items:center;color:#fff;font-size:16px}
-  .side-section-title{font-size:12px;color:var(--muted);margin:14px 16px 6px;font-weight:600;letter-spacing:.3px}
+  /* Sidebar */
+  .sidebar{width:300px;min-width:300px;background:var(--bg2);border-inline-start:1px solid var(--line);
+    display:flex;flex-direction:column;transition:margin .25s ease}
+  .side-head{padding:15px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px}
+  .brand .logo{width:32px;height:32px;border-radius:9px;background:var(--grad);display:grid;place-items:center;color:#fff;font-size:17px;box-shadow:0 4px 14px var(--accent-soft)}
+  .side-section-title{font-size:11px;color:var(--muted);margin:14px 16px 6px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
 
-  .profile-list{padding:0 10px;overflow-y:auto;flex:0 0 auto;max-height:34vh}
-  .profile{
-    padding:10px 12px;border-radius:10px;margin-bottom:6px;background:var(--bg3);
-    border:1px solid transparent;display:flex;flex-direction:column;gap:3px;position:relative;
-  }
-  .profile.active{border-color:var(--accent)}
-  .profile .pname{font-weight:600;font-size:14px;cursor:pointer;padding-inline-end:48px;
-    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .profile .purl{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .profile .pacts{position:absolute;top:8px;left:8px;display:flex;gap:4px}
-  .icon-btn{background:none;border:none;color:var(--muted);padding:4px;border-radius:6px;font-size:13px}
+  .profile-list{padding:0 10px;overflow-y:auto;flex:0 0 auto;max-height:32vh}
+  .profile{padding:10px 12px;border-radius:11px;margin-bottom:6px;background:var(--bg3);
+    border:1px solid transparent;display:flex;flex-direction:column;gap:3px;position:relative;transition:.15s}
+  .profile:hover{border-color:var(--line)}
+  .profile.active{border-color:var(--accent);background:var(--accent-soft)}
+  .profile .pname{font-weight:700;font-size:14px;cursor:pointer;padding-inline-end:48px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .profile .purl{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+  .profile .pacts{position:absolute;top:8px;left:8px;display:flex;gap:2px}
+  .icon-btn{background:none;border:none;color:var(--muted);padding:5px;border-radius:7px;font-size:13px;line-height:1}
   .icon-btn:hover{background:#ffffff14;color:var(--txt)}
-  .balance-chip{font-size:11px;color:var(--green);margin-top:2px}
+  .balance-chip{font-size:11px;color:var(--green);margin-top:2px;font-weight:600}
 
-  .btn{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:600;
-    background:var(--accent2);color:#fff;transition:.15s}
+  .btn{border:none;border-radius:10px;padding:10px 14px;font-size:14px;font-weight:700;background:var(--accent2);color:#fff;transition:.15s}
   .btn:hover{filter:brightness(1.08)}
+  .btn:active{transform:translateY(1px)}
   .btn.block{width:100%}
   .btn.ghost{background:var(--bg3);color:var(--txt);border:1px solid var(--line)}
   .btn.sm{padding:7px 11px;font-size:13px}
 
+  .search-wrap{padding:0 12px 6px}
+  .search-wrap input{width:100%;background:var(--bg3);border:1px solid var(--line);color:var(--txt);
+    border-radius:9px;padding:8px 11px;font-size:13px;outline:none}
   .conv-list{flex:1;overflow-y:auto;padding:0 10px 10px}
-  .conv{padding:9px 12px;border-radius:9px;margin-bottom:4px;font-size:13px;color:var(--muted);
-    cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .conv{padding:9px 11px;border-radius:9px;margin-bottom:4px;font-size:13px;color:var(--muted);cursor:pointer;
+    display:flex;align-items:center;gap:6px;transition:.12s}
   .conv:hover{background:var(--bg3);color:var(--txt)}
-  .conv.active{background:var(--bg3);color:var(--txt)}
+  .conv.active{background:var(--bg3);color:var(--txt);box-shadow:inset 2px 0 0 var(--accent)}
   .conv .ctitle{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex:1}
-  .conv .cacts{display:flex;gap:6px;opacity:0;transition:.15s}
+  .conv .cacts{display:flex;gap:5px;opacity:0;transition:.15s}
   .conv:hover .cacts,.conv.active .cacts{opacity:.85}
   .conv .ci{font-size:12px;padding:1px 3px;border-radius:5px}
   .conv .ci:hover{background:var(--bg);opacity:1}
   .side-foot{padding:12px;border-top:1px solid var(--line);display:flex;gap:8px}
 
-  /* ---------- Main ---------- */
+  /* Main */
   .main{flex:1;display:flex;flex-direction:column;min-width:0}
-  .topbar{height:56px;display:flex;align-items:center;gap:10px;padding:0 14px;
-    border-bottom:1px solid var(--line);background:var(--bg2)}
+  .topbar{min-height:56px;display:flex;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line);background:var(--bg2);flex-wrap:wrap}
   .hamb{display:none;background:none;border:none;color:var(--txt);font-size:22px}
-  .model-select{background:var(--bg3);color:var(--txt);border:1px solid var(--line);
-    border-radius:10px;padding:8px 12px;font-size:14px;max-width:340px;flex:0 1 auto}
+  .model-select{background:var(--bg3);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:14px;max-width:300px;flex:0 1 auto;outline:none}
   .top-spacer{flex:1}
-  .top-info{font-size:12px;color:var(--muted);text-align:start}
+  .top-info{font-size:12px;color:var(--muted)}
   .top-info b{color:var(--txt)}
+  .chip-btn{background:var(--bg3);border:1px solid var(--line);color:var(--muted);border-radius:9px;padding:7px 11px;font-size:13px;display:flex;align-items:center;gap:5px}
+  .chip-btn:hover{color:var(--txt)}
+  .chip-btn.on{border-color:var(--accent);color:var(--accent)}
 
-  .chat{flex:1;overflow-y:auto;padding:24px 0}
-  .chat-inner{max-width:820px;margin:0 auto;padding:0 18px;display:flex;flex-direction:column;gap:18px}
+  .offline-banner{display:none;background:var(--yellow);color:#1a1f2b;font-size:12px;text-align:center;padding:5px;font-weight:700}
+  .offline-banner.show{display:block}
+
+  /* Chat-settings drawer */
+  .chat-settings{display:none;background:var(--bg2);border-bottom:1px solid var(--line);padding:14px 18px}
+  .chat-settings.show{display:block}
+  .cs-inner{max-width:820px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+  .cs-inner label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px;font-weight:600}
+  .cs-inner textarea{width:100%;background:var(--bg3);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px;font-size:13px;outline:none;resize:vertical;min-height:54px}
+  .cs-grid{display:flex;gap:16px;flex-wrap:wrap}
+  .cs-grid .f{flex:1;min-width:140px}
+  .cs-grid input[type=range]{width:100%}
+  .cs-grid .val{font-size:12px;color:var(--accent);font-weight:700}
+  .cs-grid input[type=number]{width:100%;background:var(--bg3);border:1px solid var(--line);color:var(--txt);border-radius:9px;padding:7px 10px;outline:none}
+
+  .chat{flex:1;overflow-y:auto;padding:22px 0;scroll-behavior:smooth}
+  .chat-inner{max-width:820px;margin:0 auto;padding:0 18px;display:flex;flex-direction:column;gap:20px}
   .msg{display:flex;gap:12px;align-items:flex-start}
-  .msg .av{width:30px;height:30px;border-radius:8px;flex:0 0 30px;display:grid;place-items:center;font-size:14px;font-weight:700}
-  .msg.user .av{background:#2b3445;color:var(--accent)}
-  .msg.assistant .av{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
-  .bubble{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);
-    padding:12px 15px;line-height:1.85;font-size:15px;overflow-wrap:anywhere;flex:1;min-width:0}
+  .msg .av{width:32px;height:32px;border-radius:9px;flex:0 0 32px;display:grid;place-items:center;font-size:13px;font-weight:800}
+  .msg.user .av{background:var(--bg4);color:var(--accent)}
+  .msg.assistant .av{background:var(--grad);color:#fff}
+  .msg .col{flex:1;min-width:0;display:flex;flex-direction:column}
+  .bubble{background:var(--bg2);border:1px solid var(--line);border-radius:var(--radius);padding:12px 15px;line-height:1.9;font-size:15px;overflow-wrap:anywhere;position:relative}
   .msg.user .bubble{background:var(--bg3)}
   .bubble p{margin:0 0 10px}.bubble p:last-child{margin:0}
-  .bubble pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;direction:ltr;text-align:left;position:relative}
-  .bubble code{background:var(--code);padding:2px 6px;border-radius:6px;font-size:13px;direction:ltr;display:inline-block}
-  .copy-code{position:absolute;top:6px;left:6px;font-size:11px;padding:3px 8px;border-radius:6px;
-    background:var(--bg3);border:1px solid var(--line);color:var(--muted)}
-  .copy-code:hover{color:var(--txt)}
-  .bubble pre code{background:none;padding:0}
+  .bubble pre{background:var(--code);border:1px solid var(--line);border-radius:10px;padding:12px;overflow-x:auto;direction:ltr;text-align:left;margin:8px 0}
+  .bubble :not(pre)>code{background:var(--code);padding:2px 6px;border-radius:6px;font-size:13px;direction:ltr;display:inline-block}
+  .bubble pre code{background:none;padding:0;font-size:13px}
   .bubble ul,.bubble ol{margin:6px 0;padding-inline-start:22px}
+  .bubble a{color:var(--accent)}
+  .bubble table{border-collapse:collapse;margin:8px 0;display:block;overflow-x:auto}
+  .bubble th,.bubble td{border:1px solid var(--line);padding:6px 10px;font-size:14px}
+  .bubble th{background:var(--bg3)}
+  .bubble blockquote{border-inline-start:3px solid var(--accent);margin:8px 0;padding:2px 12px;color:var(--muted)}
+  .bubble img.att{max-width:240px;border-radius:10px;margin:4px 4px 4px 0;border:1px solid var(--line)}
+  .copy-code{position:absolute;top:6px;left:6px;font-size:11px;padding:3px 8px;border-radius:6px;background:var(--bg3);border:1px solid var(--line);color:var(--muted)}
+  .copy-code:hover{color:var(--txt)}
   .cursor::after{content:"▍";color:var(--accent);animation:blink 1s steps(2) infinite}
   @keyframes blink{50%{opacity:0}}
+  .msg-meta{display:flex;align-items:center;gap:8px;margin-top:7px;flex-wrap:wrap}
+  .msg-acts{display:flex;gap:6px}
+  .msg-acts button{background:none;border:1px solid var(--line);color:var(--muted);border-radius:7px;padding:3px 9px;font-size:12px}
+  .msg-acts button:hover{color:var(--txt);background:var(--bg3)}
+  .usage{font-size:11px;color:var(--muted)}
+  .edit-area{width:100%;background:var(--bg3);border:1px solid var(--accent);color:var(--txt);border-radius:10px;padding:10px;font-size:15px;outline:none;resize:vertical}
 
-  .welcome{max-width:560px;margin:8vh auto;text-align:center;color:var(--muted);padding:0 20px}
-  .welcome h2{color:var(--txt);font-size:22px;margin-bottom:8px}
-  .welcome .big{font-size:46px;margin-bottom:10px}
+  .welcome{max-width:600px;margin:7vh auto;text-align:center;color:var(--muted);padding:0 20px}
+  .welcome .big{font-size:50px;margin-bottom:8px;filter:drop-shadow(0 6px 18px var(--accent-soft))}
+  .welcome h2{color:var(--txt);font-size:23px;margin:0 0 8px}
+  .sugs{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:20px}
+  .sug{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:13px;color:var(--txt);text-align:start;cursor:pointer;transition:.15s;max-width:240px}
+  .sug:hover{border-color:var(--accent);transform:translateY(-2px)}
 
-  /* ---------- Composer ---------- */
+  /* Composer */
   .composer{border-top:1px solid var(--line);background:var(--bg2);padding:12px 0}
-  .composer-inner{max-width:820px;margin:0 auto;padding:0 18px;display:flex;gap:10px;align-items:flex-end}
-  .ta-wrap{flex:1;background:var(--bg3);border:1px solid var(--line);border-radius:14px;padding:8px 12px;display:flex}
-  textarea#input{flex:1;background:none;border:none;color:var(--txt);resize:none;font-size:15px;
-    line-height:1.6;max-height:180px;outline:none}
-  .send-btn{width:46px;height:46px;border-radius:12px;border:none;background:var(--accent2);color:#fff;font-size:18px;flex:0 0 46px}
+  .composer-inner{max-width:820px;margin:0 auto;padding:0 18px}
+  .attach-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+  .att-thumb{position:relative;width:58px;height:58px;border-radius:9px;overflow:hidden;border:1px solid var(--line)}
+  .att-thumb img{width:100%;height:100%;object-fit:cover}
+  .att-thumb .x{position:absolute;top:2px;left:2px;background:#000a;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:11px;line-height:1;cursor:pointer}
+  .composer-bar{display:flex;gap:10px;align-items:flex-end}
+  .ta-wrap{flex:1;background:var(--bg3);border:1px solid var(--line);border-radius:14px;padding:6px 8px 6px 12px;display:flex;align-items:flex-end;gap:6px;transition:.15s}
+  .ta-wrap:focus-within{border-color:var(--accent)}
+  textarea#input{flex:1;background:none;border:none;color:var(--txt);resize:none;font-size:15px;line-height:1.6;max-height:200px;outline:none;padding:7px 0}
+  .attach-btn{background:none;border:none;color:var(--muted);font-size:19px;padding:6px;border-radius:8px}
+  .attach-btn:hover{color:var(--accent);background:var(--bg4)}
+  .send-btn{width:46px;height:46px;border-radius:13px;border:none;background:var(--grad);color:#fff;font-size:18px;flex:0 0 46px;box-shadow:0 4px 14px var(--accent-soft)}
   .send-btn:disabled{opacity:.45;cursor:not-allowed}
-  .composer-hint{max-width:820px;margin:6px auto 0;padding:0 18px;font-size:11px;color:var(--muted)}
+  .composer-hint{display:flex;justify-content:space-between;margin-top:6px;font-size:11px;color:var(--muted)}
 
-  /* ---------- Modal ---------- */
-  .overlay{position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
+  /* Modal */
+  .overlay{position:fixed;inset:0;background:#000b;backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:50;padding:16px}
   .overlay.show{display:flex}
-  .modal{background:var(--bg2);border:1px solid var(--line);border-radius:18px;width:100%;max-width:460px;
-    box-shadow:var(--shadow);max-height:90dvh;overflow-y:auto}
+  .modal{background:var(--bg2);border:1px solid var(--line);border-radius:18px;width:100%;max-width:470px;box-shadow:var(--shadow);max-height:90dvh;overflow-y:auto}
   .modal-head{padding:18px 20px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
   .modal-head h3{margin:0;font-size:17px}
   .modal-body{padding:20px;display:flex;flex-direction:column;gap:14px}
   .field label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-  .field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--line);
-    color:var(--txt);border-radius:10px;padding:10px 12px;font-size:14px;outline:none}
+  .field input,.field select,.field textarea{width:100%;background:var(--bg3);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px 12px;font-size:14px;outline:none}
   .field input:focus,.field textarea:focus{border-color:var(--accent)}
-  .row2{display:flex;gap:10px}.row2>*{flex:1}
   .modal-foot{padding:16px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end}
   .test-result{font-size:13px;padding:8px 12px;border-radius:8px;display:none}
   .test-result.ok{display:block;background:#3ecf8e22;color:var(--green)}
   .test-result.err{display:block;background:#ff6b6b22;color:var(--red)}
   .muted-note{font-size:12px;color:var(--muted);line-height:1.7}
-
-  .offline-banner{display:none;background:var(--yellow);color:#1a1f2b;font-size:12px;text-align:center;padding:5px;font-weight:600}
-  .offline-banner.show{display:block}
-
-  /* message actions */
-  .msg .bubble{position:relative}
-  .msg-acts{display:flex;gap:6px;margin-top:8px}
-  .msg-acts button{background:none;border:1px solid var(--line);color:var(--muted);
-    border-radius:7px;padding:3px 9px;font-size:12px}
-  .msg-acts button:hover{color:var(--txt);background:var(--bg3)}
-
-  /* settings rows */
-  .set-row{display:flex;justify-content:space-between;align-items:center;gap:12px;
-    padding:12px 0;border-bottom:1px solid var(--line)}
-  .set-row:last-child{border-bottom:none}
-  .set-row .lbl{font-size:14px}
+  .set-row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+  .set-row:last-of-type{border-bottom:none}
+  .set-row .lbl{font-size:14px;font-weight:600}
   .set-row .sub{font-size:12px;color:var(--muted);margin-top:2px}
   .seg{display:flex;background:var(--bg3);border:1px solid var(--line);border-radius:9px;overflow:hidden}
   .seg button{background:none;border:none;color:var(--muted);padding:7px 14px;font-size:13px}
   .seg button.on{background:var(--accent2);color:#fff}
 
-  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg3);
-    border:1px solid var(--line);padding:10px 18px;border-radius:10px;font-size:13px;z-index:99;
-    opacity:0;transition:.2s;pointer-events:none}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--bg4);border:1px solid var(--line);padding:10px 18px;border-radius:10px;font-size:13px;z-index:99;opacity:0;transition:.2s;pointer-events:none;box-shadow:var(--shadow)}
   .toast.show{opacity:1}
   .scrim{position:fixed;inset:0;background:#0008;display:none;z-index:9}
   .scrim.show{display:block}
 
-  /* ---------- Responsive ---------- */
   @media(max-width:820px){
     .sidebar{position:fixed;inset-inline-end:0;top:0;bottom:0;z-index:20;margin-inline-end:-310px;box-shadow:var(--shadow)}
     .sidebar.open{margin-inline-end:0}
     .hamb{display:block}
-    .profile-list{max-height:30vh}
+    .model-select{max-width:170px}
+    .top-info{display:none}
   }
 </style>
 </head>
@@ -185,20 +207,18 @@
   <aside class="sidebar" id="sidebar">
     <div class="side-head">
       <div class="brand"><span class="logo">◆</span><span>NewAPI Chat</span></div>
+      <button class="icon-btn" id="settingsBtn" title="تنظیمات" style="font-size:18px">⚙</button>
     </div>
 
     <div class="side-section-title">سرویس‌ها</div>
     <div class="profile-list" id="profileList"></div>
-    <div style="padding:6px 16px 0">
-      <button class="btn ghost block sm" id="addProfileBtn">+ افزودن سرویس</button>
-    </div>
+    <div style="padding:6px 16px 0"><button class="btn ghost block sm" id="addProfileBtn">+ افزودن سرویس</button></div>
 
     <div class="side-section-title">گفتگوها</div>
+    <div class="search-wrap"><input id="convSearch" placeholder="جستجو در گفتگوها…" /></div>
     <div class="conv-list" id="convList"></div>
 
-    <div class="side-foot">
-      <button class="btn block sm" id="newChatBtn">+ گفتگوی جدید</button>
-    </div>
+    <div class="side-foot"><button class="btn block sm" id="newChatBtn">+ گفتگوی جدید</button></div>
   </aside>
   <div class="scrim" id="scrim"></div>
 
@@ -206,88 +226,92 @@
   <main class="main">
     <div class="topbar">
       <button class="hamb" id="hambBtn">☰</button>
-      <select class="model-select" id="modelSelect" title="انتخاب مدل">
-        <option value="">— مدلی انتخاب نشده —</option>
-      </select>
+      <select class="model-select" id="modelSelect" title="انتخاب مدل"><option value="">— مدل —</option></select>
       <button class="icon-btn" id="reloadModelsBtn" title="بارگذاری مجدد مدل‌ها">⟳</button>
+      <button class="chip-btn" id="chatSettingsBtn" title="تنظیمات گفتگو">⚙ گفتگو</button>
       <div class="top-spacer"></div>
       <div class="top-info" id="topInfo"></div>
-      <button class="icon-btn" id="settingsBtn" title="تنظیمات" style="font-size:18px">⚙</button>
     </div>
     <div class="offline-banner" id="offlineBanner">آفلاین هستید — ارسال پیام ممکن نیست</div>
+
+    <!-- Chat settings drawer -->
+    <div class="chat-settings" id="chatSettings">
+      <div class="cs-inner">
+        <div>
+          <label>System Prompt (نقش/دستور سیستمی برای این گفتگو)</label>
+          <textarea id="csSystem" placeholder="مثلاً: تو یک دستیار فارسی‌زبان و دقیق هستی…"></textarea>
+        </div>
+        <div class="cs-grid">
+          <div class="f">
+            <label>Temperature · <span class="val" id="csTempVal">0.7</span></label>
+            <input type="range" id="csTemp" min="0" max="2" step="0.1" value="0.7" />
+          </div>
+          <div class="f">
+            <label>حداکثر توکن خروجی (۰ = پیش‌فرض سرور)</label>
+            <input type="number" id="csMax" min="0" step="64" value="0" />
+          </div>
+          <div class="f">
+            <label>Top P · <span class="val" id="csTopPVal">1</span></label>
+            <input type="range" id="csTopP" min="0" max="1" step="0.05" value="1" />
+          </div>
+        </div>
+      </div>
+    </div>
 
     <div class="chat" id="chat">
       <div class="welcome" id="welcome">
         <div class="big">◆</div>
         <h2>به NewAPI Chat خوش آمدید</h2>
-        <p>یک سرویس اضافه کنید (آدرس سرور + کلید وب‌سرویس)، مدل را انتخاب کنید و گفتگو را شروع کنید. سرویس‌های مبتنی بر New-API مانند AgentRouter و BluesMinds پشتیبانی می‌شوند.</p>
-        <button class="btn" id="welcomeAddBtn" style="margin-top:14px">شروع — افزودن سرویس</button>
+        <p>یک سرویس اضافه کنید (آدرس سرور + کلید)، مدل را انتخاب کنید و گفتگو را شروع کنید.</p>
+        <div class="sugs" id="sugs"></div>
+        <button class="btn" id="welcomeAddBtn" style="margin-top:18px">+ افزودن سرویس</button>
       </div>
       <div class="chat-inner" id="chatInner" style="display:none"></div>
     </div>
 
     <div class="composer">
       <div class="composer-inner">
-        <div class="ta-wrap">
-          <textarea id="input" rows="1" placeholder="پیام خود را بنویسید…  (Enter ارسال، Shift+Enter خط جدید)"></textarea>
+        <div class="attach-row" id="attachRow" style="display:none"></div>
+        <div class="composer-bar">
+          <div class="ta-wrap">
+            <textarea id="input" rows="1" placeholder="پیام خود را بنویسید…  (Enter ارسال، Shift+Enter خط جدید)"></textarea>
+            <button class="attach-btn" id="attachBtn" title="افزودن تصویر">📎</button>
+          </div>
+          <button class="send-btn" id="sendBtn" title="ارسال">➤</button>
         </div>
-        <button class="send-btn" id="sendBtn" title="ارسال">➤</button>
+        <div class="composer-hint"><span id="hint"></span><span id="charCount"></span></div>
       </div>
-      <div class="composer-hint" id="hint"></div>
     </div>
   </main>
 </div>
 
+<input type="file" id="imgFile" accept="image/*" multiple style="display:none" />
+<input type="file" id="importFile" accept="application/json,.json" style="display:none" />
+
 <!-- Profile Modal -->
 <div class="overlay" id="profileModal">
   <div class="modal">
-    <div class="modal-head">
-      <h3 id="modalTitle">افزودن سرویس</h3>
-      <button class="icon-btn" id="closeModalBtn" style="font-size:18px">✕</button>
-    </div>
+    <div class="modal-head"><h3 id="modalTitle">افزودن سرویس</h3><button class="icon-btn" id="closeModalBtn" style="font-size:18px">✕</button></div>
     <div class="modal-body">
-      <div class="field">
-        <label>سرویس آماده</label>
-        <select id="fPreset">
-          <option value="">— انتخاب از لیست یا «دلخواه» —</option>
-        </select>
-      </div>
-      <div class="field">
-        <label>نام دلخواه</label>
-        <input id="fName" placeholder="مثلاً AgentRouter" />
-      </div>
-      <div class="field">
-        <label>آدرس سرور (Base URL)</label>
-        <input id="fUrl" placeholder="https://api.bluesminds.com" dir="ltr" />
-      </div>
-      <div class="field">
-        <label>کلید وب‌سرویس (API Key)</label>
-        <input id="fKey" placeholder="sk-..." dir="ltr" type="password" />
-      </div>
+      <div class="field"><label>سرویس آماده</label><select id="fPreset"><option value="">— انتخاب از لیست یا «دلخواه» —</option></select></div>
+      <div class="field"><label>نام دلخواه</label><input id="fName" placeholder="مثلاً AgentRouter" /></div>
+      <div class="field"><label>آدرس سرور (Base URL)</label><input id="fUrl" placeholder="https://api.bluesminds.com" dir="ltr" /></div>
+      <div class="field"><label>کلید وب‌سرویس (API Key)</label><input id="fKey" placeholder="sk-..." dir="ltr" type="password" /></div>
       <div class="test-result" id="testResult"></div>
-      <div class="muted-note">آدرس را بدون <code>/v1</code> وارد کنید؛ خودش اضافه می‌شود. کلید و آدرس فقط روی همین دستگاه ذخیره می‌شوند.</div>
+      <div class="muted-note">آدرس را بدون <code>/v1</code> وارد کنید. کلید و آدرس فقط روی همین دستگاه ذخیره می‌شوند.</div>
     </div>
-    <div class="modal-foot">
-      <button class="btn ghost sm" id="testBtn">تست اتصال</button>
-      <button class="btn sm" id="saveProfileBtn">ذخیره</button>
-    </div>
+    <div class="modal-foot"><button class="btn ghost sm" id="testBtn">تست اتصال</button><button class="btn sm" id="saveProfileBtn">ذخیره</button></div>
   </div>
 </div>
 
 <!-- Settings Modal -->
 <div class="overlay" id="settingsModal">
   <div class="modal">
-    <div class="modal-head">
-      <h3>تنظیمات</h3>
-      <button class="icon-btn" id="closeSettingsBtn" style="font-size:18px">✕</button>
-    </div>
+    <div class="modal-head"><h3>تنظیمات</h3><button class="icon-btn" id="closeSettingsBtn" style="font-size:18px">✕</button></div>
     <div class="modal-body">
       <div class="set-row">
         <div><div class="lbl">تم</div><div class="sub">ظاهر روشن یا تاریک</div></div>
-        <div class="seg" id="themeSeg">
-          <button data-theme-val="dark">تاریک</button>
-          <button data-theme-val="light">روشن</button>
-        </div>
+        <div class="seg" id="themeSeg"><button data-theme-val="dark">تاریک</button><button data-theme-val="light">روشن</button></div>
       </div>
       <div class="set-row">
         <div><div class="lbl">پشتیبان‌گیری</div><div class="sub">ذخیره‌ی همه‌ی سرویس‌ها و گفتگوها در یک فایل</div></div>
@@ -301,168 +325,123 @@
         <div><div class="lbl" style="color:var(--red)">پاک کردن همه</div><div class="sub">حذف کامل سرویس‌ها، کلیدها و گفتگوها</div></div>
         <button class="btn ghost sm" id="clearAllBtn" style="color:var(--red)">پاک کن</button>
       </div>
-      <div class="muted-note">نسخه ۱.۱ · همه‌ی داده‌ها فقط روی همین دستگاه ذخیره می‌شوند.</div>
+      <div class="muted-note">نسخه ۲.۰ · همه‌ی داده‌ها فقط روی همین دستگاه ذخیره می‌شوند.</div>
     </div>
   </div>
 </div>
-<input type="file" id="importFile" accept="application/json,.json" style="display:none" />
 
 <div class="toast" id="toast"></div>
 
 <script>
 /* ============================================================
-   NewAPI Chat — single-file PWA client for New-API servers
+   NewAPI Chat v2 — frontend-only client for New-API servers
    ============================================================ */
-const LS = {
-  profiles:'na_profiles', active:'na_active_profile',
-  convs:'na_convs', model:'na_model_', theme:'na_theme'
-};
-const APP_VERSION = '1.1';
-function timeoutSignal(ms){ const c=new AbortController(); setTimeout(()=>c.abort(new DOMException('timeout','AbortError')),ms); return c.signal }
+const LS = { profiles:'na_profiles', active:'na_active_profile', convs:'na_convs', model:'na_model_', theme:'na_theme', settings:'na_settings' };
+const APP_VERSION='2.0';
 const $ = s => document.querySelector(s);
 const uid = () => Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function load(k,def){ try{return JSON.parse(localStorage.getItem(k)) ?? def}catch{return def} }
+function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toast._t); toast._t=setTimeout(()=>t.classList.remove('show'),2400) }
+function timeoutSignal(ms){ const c=new AbortController(); setTimeout(()=>c.abort(new DOMException('timeout','AbortError')),ms); return c.signal }
 
-/* سرویس‌های آماده — کاربر فقط کلید را وارد می‌کند */
 const PRESETS = [
-  { name:'AgentRouter', url:'https://agentrouter.org', note:'کنسول کلید: agentrouter.org/console/token' },
+  { name:'AgentRouter', url:'https://agentrouter.org', note:'⚠️ این سرور پشت فایروال WAF است و معمولاً از مرورگر کار نمی‌کند. کلید: agentrouter.org/console/token' },
   { name:'BluesMinds',  url:'https://api.bluesminds.com', note:'' }
 ];
+const SUGGESTIONS = ['یک تابع پایتون برای مرتب‌سازی سریع بنویس','تفاوت TCP و UDP را ساده توضیح بده','یک ایمیل حرفه‌ای برای پیگیری جلسه بنویس','۵ ایده برای پست اینستاگرام یک کافه بده'];
 
 let state = {
   profiles: load(LS.profiles, []),
   activeId: localStorage.getItem(LS.active) || null,
-  convs: load(LS.convs, []),       // {id, profileId, title, model, messages:[{role,content}]}
+  convs: load(LS.convs, []),
+  settings: load(LS.settings, {temperature:0.7, maxTokens:0, topP:1}),
   currentConvId: null,
   editingProfileId: null,
   streaming: false,
   abort: null,
+  attachments: [],   // {dataUrl}
+  convFilter: '',
 };
 
-function load(k,def){ try{return JSON.parse(localStorage.getItem(k)) ?? def}catch{return def} }
-function save(k,v){ localStorage.setItem(k, JSON.stringify(v)) }
-function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200) }
-
 function activeProfile(){ return state.profiles.find(p=>p.id===state.activeId) || null }
+function currentConv(){ return state.convs.find(c=>c.id===state.currentConvId) || null }
 function baseV1(url){ url=url.trim().replace(/\/+$/,''); return url.replace(/\/v1$/,'') }
-function apiUrl(p, path){ return baseV1(p.url) + path }
+function apiUrl(p, path){ return baseV1(p.url)+path }
 
 /* ---------- API ---------- */
 async function fetchModels(p){
   let r;
-  try{
-    r = await fetch(apiUrl(p,'/v1/models'),{headers:{Authorization:'Bearer '+p.key},signal:timeoutSignal(15000)});
-  }catch(e){
-    if(e.name==='AbortError') throw new Error('پاسخ نداد (timeout)');
-    throw new Error('عدم دسترسی به سرور (شبکه/CORS)');
-  }
+  try{ r = await fetch(apiUrl(p,'/v1/models'),{headers:{Authorization:'Bearer '+p.key},signal:timeoutSignal(15000)}); }
+  catch(e){ if(e.name==='AbortError') throw new Error('پاسخ نداد (timeout)'); throw new Error('عدم دسترسی به سرور (شبکه/CORS)'); }
   if(!r.ok) throw new Error('HTTP '+r.status+(r.status===401?' — کلید نامعتبر':''));
-  const ct = r.headers.get('content-type')||'';
-  const body = await r.text();
-  if(ct.includes('text/html') || /^\s*</.test(body)){
-    throw new Error('سرور صفحه‌ی تأیید/فایروال (WAF) برگرداند، نه پاسخ API — این سرور از مرورگر قابل دسترسی نیست');
-  }
+  const ct=r.headers.get('content-type')||''; const body=await r.text();
+  if(ct.includes('text/html')||/^\s*</.test(body)) throw new Error('سرور صفحه‌ی فایروال (WAF) برگرداند، نه پاسخ API — از مرورگر قابل دسترسی نیست');
   let j; try{ j=JSON.parse(body) }catch{ throw new Error('پاسخ نامعتبر از سرور') }
   return (j.data||[]).map(m=>m.id).sort();
 }
-
 async function fetchBalance(p){
-  // OpenAI-compatible billing endpoints used by New-API / One-API
-  const tryGet = async path => {
-    try{
-      const r = await fetch(apiUrl(p,path),{headers:{Authorization:'Bearer '+p.key}});
-      if(!r.ok) return null;
-      return await r.json();
-    }catch{ return null }
-  };
-  let sub = await tryGet('/dashboard/billing/subscription') || await tryGet('/v1/dashboard/billing/subscription');
+  const tryGet=async path=>{ try{ const r=await fetch(apiUrl(p,path),{headers:{Authorization:'Bearer '+p.key},signal:timeoutSignal(12000)}); if(!r.ok) return null; const ct=r.headers.get('content-type')||''; if(!ct.includes('json')) return null; return await r.json(); }catch{ return null } };
+  let sub=await tryGet('/dashboard/billing/subscription')||await tryGet('/v1/dashboard/billing/subscription');
   if(!sub) return null;
-  const total = Number(sub.hard_limit_usd ?? sub.soft_limit_usd ?? 0);
-  let used = 0;
-  const usage = await tryGet('/dashboard/billing/usage') || await tryGet('/v1/dashboard/billing/usage');
-  if(usage) used = Number(usage.total_usage||0)/100; // cents -> usd
+  const total=Number(sub.hard_limit_usd ?? sub.soft_limit_usd ?? 0);
+  let used=0; const usage=await tryGet('/dashboard/billing/usage')||await tryGet('/v1/dashboard/billing/usage');
+  if(usage) used=Number(usage.total_usage||0)/100;
   return { total, used, remaining: total-used };
 }
-
-async function streamChat(p, model, messages, onDelta, signal){
-  const r = await fetch(apiUrl(p,'/v1/chat/completions'),{
-    method:'POST',
-    headers:{'Content-Type':'application/json',Authorization:'Bearer '+p.key},
-    body:JSON.stringify({model, messages, stream:true}),
-    signal
-  });
-  if(!r.ok){
-    let msg='HTTP '+r.status;
-    try{ const e=await r.json(); msg=e.error?.message||e.message||msg }catch{}
-    throw new Error(msg);
-  }
-  const reader = r.body.getReader();
-  const dec = new TextDecoder();
-  let buf='';
+async function streamChat(p, body, onDelta, onUsage, signal){
+  const r=await fetch(apiUrl(p,'/v1/chat/completions'),{method:'POST',
+    headers:{'Content-Type':'application/json',Authorization:'Bearer '+p.key},body:JSON.stringify(body),signal});
+  if(!r.ok){ let msg='HTTP '+r.status; try{ const e=await r.json(); msg=e.error?.message||e.message||msg }catch{} throw new Error(msg); }
+  const ct=r.headers.get('content-type')||'';
+  if(ct.includes('text/html')) throw new Error('سرور صفحه‌ی فایروال (WAF) برگرداند');
+  const reader=r.body.getReader(), dec=new TextDecoder(); let buf='';
   while(true){
-    const {value,done} = await reader.read();
-    if(done) break;
-    buf += dec.decode(value,{stream:true});
-    const lines = buf.split('\n');
-    buf = lines.pop();
+    const {value,done}=await reader.read(); if(done) break;
+    buf+=dec.decode(value,{stream:true});
+    const lines=buf.split('\n'); buf=lines.pop();
     for(const line of lines){
-      const t = line.trim();
-      if(!t.startsWith('data:')) continue;
-      const data = t.slice(5).trim();
-      if(data==='[DONE]') return;
-      try{
-        const j = JSON.parse(data);
-        const d = j.choices?.[0]?.delta?.content;
-        if(d) onDelta(d);
-      }catch{}
+      const t=line.trim(); if(!t.startsWith('data:')) continue;
+      const data=t.slice(5).trim(); if(data==='[DONE]') return;
+      try{ const j=JSON.parse(data); const d=j.choices?.[0]?.delta?.content; if(d) onDelta(d); if(j.usage) onUsage&&onUsage(j.usage); }catch{}
     }
   }
 }
 
-/* ---------- Markdown (minimal & safe) ---------- */
-function esc(s){ return s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])) }
-function md(src){
-  // code blocks
-  const blocks=[];
-  src = src.replace(/```(\w*)\n?([\s\S]*?)```/g,(m,lang,code)=>{
-    blocks.push('<pre><code>'+esc(code.replace(/\n$/,''))+'</code></pre>');
-    return ' '+(blocks.length-1)+' ';
-  });
-  src = esc(src);
-  src = src.replace(/`([^`]+)`/g,'<code>$1</code>');
-  src = src.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
-  src = src.replace(/(^|[^*])\*([^*]+)\*/g,'$1<em>$2</em>');
-  // lists
-  src = src.replace(/^(?:\s*[-*]\s.+\n?)+/gm, m=>{
-    const items = m.trim().split('\n').map(l=>'<li>'+l.replace(/^\s*[-*]\s/,'')+'</li>').join('');
-    return '<ul>'+items+'</ul>';
-  });
-  src = src.split(/\n{2,}/).map(b=>{
-    if(/^\s*<(ul|pre|h\d)/.test(b)) return b;
-    if(b.includes(' ')) return b;
-    return '<p>'+b.replace(/\n/g,'<br>')+'</p>';
-  }).join('');
-  src = src.replace(/ (\d+) /g,(m,i)=>blocks[i]);
-  return src;
+/* ---------- Markdown ---------- */
+function fallbackMd(src){
+  const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+  return '<p>'+esc(src).replace(/\n/g,'<br>')+'</p>';
 }
+function renderMarkdown(text){
+  let html;
+  try{ html = window.marked ? marked.parse(text,{breaks:true,gfm:true}) : fallbackMd(text); }
+  catch{ html = fallbackMd(text); }
+  if(window.DOMPurify) html = DOMPurify.sanitize(html,{ADD_ATTR:['target']});
+  return html;
+}
+function enhanceCode(scope){
+  scope.querySelectorAll('pre code').forEach(b=>{ if(window.hljs && !b.dataset.hl){ try{hljs.highlightElement(b)}catch{} b.dataset.hl=1 } });
+  scope.querySelectorAll('.bubble pre').forEach(pre=>{
+    if(pre.querySelector('.copy-code')) return;
+    const btn=document.createElement('button'); btn.className='copy-code'; btn.textContent='کپی';
+    btn.onclick=()=>{ navigator.clipboard.writeText(pre.querySelector('code').innerText).then(()=>{btn.textContent='✓';setTimeout(()=>btn.textContent='کپی',1200)}) };
+    pre.appendChild(btn);
+  });
+}
+function msgText(content){ return Array.isArray(content)? content.filter(x=>x.type==='text').map(x=>x.text).join('\n') : (content||'') }
+function msgImages(content){ return Array.isArray(content)? content.filter(x=>x.type==='image_url').map(x=>x.image_url.url) : [] }
 
-/* ---------- Rendering ---------- */
+/* ---------- Profiles ---------- */
 function renderProfiles(){
-  const el = $('#profileList'); el.innerHTML='';
-  if(!state.profiles.length){
-    el.innerHTML='<div class="muted-note" style="padding:4px 6px">هنوز سرویسی اضافه نشده.</div>';
-    return;
-  }
+  const el=$('#profileList'); el.innerHTML='';
+  if(!state.profiles.length){ el.innerHTML='<div class="muted-note" style="padding:4px 6px">هنوز سرویسی اضافه نشده.</div>'; return }
   state.profiles.forEach(p=>{
-    const d=document.createElement('div');
-    d.className='profile'+(p.id===state.activeId?' active':'');
-    d.innerHTML=`
-      <div class="pname" title="${esc(p.name)}">${esc(p.name)}</div>
+    const d=document.createElement('div'); d.className='profile'+(p.id===state.activeId?' active':'');
+    d.innerHTML=`<div class="pname" title="${esc(p.name)}">${esc(p.name)}</div>
       <div class="purl" dir="ltr">${esc(baseV1(p.url))}</div>
       <div class="balance-chip" data-bal="${p.id}"></div>
-      <div class="pacts">
-        <button class="icon-btn" data-edit="${p.id}" title="ویرایش">✎</button>
-        <button class="icon-btn" data-del="${p.id}" title="حذف">🗑</button>
-      </div>`;
+      <div class="pacts"><button class="icon-btn" data-edit="${p.id}" title="ویرایش">✎</button><button class="icon-btn" data-del="${p.id}" title="حذف">🗑</button></div>`;
     d.querySelector('.pname').onclick=()=>selectProfile(p.id);
     d.querySelector('.purl').onclick=()=>selectProfile(p.id);
     d.querySelector('[data-edit]').onclick=()=>openProfileModal(p.id);
@@ -470,370 +449,319 @@ function renderProfiles(){
     el.appendChild(d);
   });
 }
+function esc(s){ return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
 
 function renderConvs(){
   const el=$('#convList'); el.innerHTML='';
-  const list = state.convs.filter(c=>c.profileId===state.activeId);
-  if(!list.length){ el.innerHTML='<div class="muted-note" style="padding:4px 6px">گفتگویی وجود ندارد.</div>'; return }
+  let list=state.convs.filter(c=>c.profileId===state.activeId);
+  const q=state.convFilter.trim().toLowerCase();
+  if(q) list=list.filter(c=>(c.title||'').toLowerCase().includes(q) || c.messages.some(m=>msgText(m.content).toLowerCase().includes(q)));
+  if(!list.length){ el.innerHTML='<div class="muted-note" style="padding:4px 6px">'+(q?'نتیجه‌ای نبود.':'گفتگویی وجود ندارد.')+'</div>'; return }
   list.slice().reverse().forEach(c=>{
-    const d=document.createElement('div');
-    d.className='conv'+(c.id===state.currentConvId?' active':'');
+    const d=document.createElement('div'); d.className='conv'+(c.id===state.currentConvId?' active':'');
     d.innerHTML=`<span class="ctitle">${esc(c.title||'گفتگوی جدید')}</span>
-      <span class="cacts">
-        <span class="ci" data-ren title="تغییر نام">✎</span>
-        <span class="ci" data-exp title="خروجی Markdown">⬇</span>
-        <span class="ci" data-del title="حذف">🗑</span>
-      </span>`;
+      <span class="cacts"><span class="ci" data-ren title="تغییر نام">✎</span><span class="ci" data-exp title="خروجی Markdown">⬇</span><span class="ci" data-del title="حذف">🗑</span></span>`;
     d.querySelector('.ctitle').onclick=()=>openConv(c.id);
-    d.querySelector('[data-ren]').onclick=(e)=>{e.stopPropagation();renameConv(c.id)};
-    d.querySelector('[data-exp]').onclick=(e)=>{e.stopPropagation();exportConv(c.id)};
-    d.querySelector('[data-del]').onclick=(e)=>{e.stopPropagation();delConv(c.id)};
+    d.querySelector('[data-ren]').onclick=e=>{e.stopPropagation();renameConv(c.id)};
+    d.querySelector('[data-exp]').onclick=e=>{e.stopPropagation();exportConv(c.id)};
+    d.querySelector('[data-del]').onclick=e=>{e.stopPropagation();delConv(c.id)};
     el.appendChild(d);
   });
 }
 
+/* ---------- Chat rendering ---------- */
 function renderChat(){
-  const conv = state.convs.find(c=>c.id===state.currentConvId);
-  const inner=$('#chatInner'), welcome=$('#welcome');
+  const conv=currentConv(); const inner=$('#chatInner'), welcome=$('#welcome');
   if(!conv || !conv.messages.length){
-    if(!state.profiles.length){ welcome.style.display='block'; inner.style.display='none'; return }
-    welcome.style.display='none'; inner.style.display='flex'; inner.innerHTML=
-      '<div class="muted-note" style="text-align:center;margin:10vh 0">پیامی بفرستید تا گفتگو شروع شود.</div>';
+    if(!state.profiles.length || !conv){ welcome.style.display='block'; inner.style.display='none'; return }
+    welcome.style.display='none'; inner.style.display='flex';
+    inner.innerHTML='<div class="muted-note" style="text-align:center;margin:10vh 0">پیامی بفرستید تا گفتگو شروع شود.</div>';
     return;
   }
   welcome.style.display='none'; inner.style.display='flex'; inner.innerHTML='';
-  conv.messages.forEach(m=>inner.appendChild(msgEl(m.role, m.content)));
-  enhanceCode(inner);
-  scrollDown();
+  conv.messages.forEach((m,i)=>inner.appendChild(buildMsg(conv,m,i)));
+  enhanceCode(inner); scrollDown();
 }
-function msgEl(role,content){
-  const d=document.createElement('div'); d.className='msg '+role;
-  d.innerHTML=`<div class="av">${role==='user'?'شما':'◆'}</div>
-    <div style="flex:1;min-width:0;display:flex;flex-direction:column">
-      <div class="bubble">${md(content)}</div>
-      <div class="msg-acts"><button class="act-copy">کپی</button></div>
+function buildMsg(conv,m,i){
+  const d=document.createElement('div'); d.className='msg '+m.role;
+  const isLast=i===conv.messages.length-1;
+  const imgs=msgImages(m.content).map(u=>`<img class="att" src="${u}">`).join('');
+  let acts='';
+  if(m.role==='user') acts=`<button data-edit>ویرایش</button><button data-copy>کپی</button><button data-del>حذف</button>`;
+  else acts=`<button data-copy>کپی</button>${isLast?'<button data-regen>تولید مجدد</button>':''}<button data-del>حذف</button>`;
+  const usage=m.usage?`<span class="usage">${m.usage.total_tokens?('🔢 '+m.usage.total_tokens+' توکن'):''}</span>`:'';
+  d.innerHTML=`<div class="av">${m.role==='user'?'شما':'◆'}</div>
+    <div class="col">
+      <div class="bubble">${imgs}${renderMarkdown(msgText(m.content))}</div>
+      <div class="msg-meta"><div class="msg-acts">${acts}</div>${usage}</div>
     </div>`;
-  d.querySelector('.act-copy').onclick=()=>{
-    const txt=d.querySelector('.bubble').innerText;
-    navigator.clipboard.writeText(txt).then(()=>toast('کپی شد')).catch(()=>toast('کپی ناموفق'));
-  };
+  const bubble=d.querySelector('.bubble');
+  d.querySelector('[data-copy]').onclick=()=>navigator.clipboard.writeText(msgText(m.content)).then(()=>toast('کپی شد'));
+  d.querySelector('[data-del]').onclick=()=>{ conv.messages.splice(i,1); save(LS.convs,state.convs); renderChat() };
+  const regen=d.querySelector('[data-regen]'); if(regen) regen.onclick=()=>regenerate(i);
+  const edit=d.querySelector('[data-edit]'); if(edit) edit.onclick=()=>startEdit(conv,i,bubble);
   return d;
 }
-function enhanceCode(scope){
-  (scope||document).querySelectorAll('.bubble pre').forEach(pre=>{
-    if(pre.querySelector('.copy-code')) return;
-    const b=document.createElement('button'); b.className='copy-code'; b.textContent='کپی';
-    b.onclick=()=>{ navigator.clipboard.writeText(pre.querySelector('code').innerText).then(()=>{b.textContent='✓';setTimeout(()=>b.textContent='کپی',1200)}) };
-    pre.appendChild(b);
-  });
+function startEdit(conv,i,bubble){
+  const ta=document.createElement('textarea'); ta.className='edit-area'; ta.value=msgText(conv.messages[i].content);
+  ta.style.height='auto'; bubble.replaceWith(ta); ta.style.height=ta.scrollHeight+'px'; ta.focus();
+  const save2=()=>{ const v=ta.value.trim(); if(v){ conv.messages[i].content=v; conv.messages.splice(i+1); runAssistant(conv); } };
+  ta.addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();save2()} if(e.key==='Escape') renderChat() });
 }
 function scrollDown(){ const c=$('#chat'); c.scrollTop=c.scrollHeight }
 
 function renderModels(){
   const sel=$('#modelSelect'); const p=activeProfile();
-  sel.innerHTML='<option value="">— انتخاب مدل —</option>';
-  if(!p||!p.models){ return }
-  p.models.forEach(m=>{
-    const o=document.createElement('option'); o.value=m; o.textContent=m; sel.appendChild(o);
-  });
-  const saved = localStorage.getItem(LS.model+p.id);
-  if(saved && p.models.includes(saved)) sel.value=saved;
+  sel.innerHTML='<option value="">— مدل —</option>';
+  if(!p||!p.models) return;
+  p.models.forEach(m=>{ const o=document.createElement('option'); o.value=m; o.textContent=m; sel.appendChild(o); });
+  const saved=localStorage.getItem(LS.model+p.id);
+  if(saved&&p.models.includes(saved)) sel.value=saved;
   else if(p.models[0]){ sel.value=p.models[0]; localStorage.setItem(LS.model+p.id,p.models[0]) }
 }
-
-function renderTopInfo(){
-  const p=activeProfile(); const el=$('#topInfo');
-  if(!p){ el.innerHTML=''; return }
-  el.innerHTML=`<b>${esc(p.name)}</b>`;
-  updateBalances();
-}
-
+function renderTopInfo(){ const p=activeProfile(); $('#topInfo').innerHTML = p?`<b>${esc(p.name)}</b>`:''; if(p) updateBalances(); }
 async function updateBalances(){
   for(const p of state.profiles){
     fetchBalance(p).then(b=>{
       const chip=document.querySelector(`[data-bal="${p.id}"]`);
-      if(b && chip){
-        chip.textContent=`موجودی: $${b.remaining.toFixed(3)} از $${b.total.toFixed(2)}`;
-      }
-      if(p.id===state.activeId && b){
-        $('#topInfo').innerHTML=`<b>${esc(p.name)}</b> · موجودی $${b.remaining.toFixed(3)}`;
-      }
+      if(b&&chip) chip.textContent=`موجودی: $${b.remaining.toFixed(3)} از $${b.total.toFixed(2)}`;
+      if(p.id===state.activeId&&b) $('#topInfo').innerHTML=`<b>${esc(p.name)}</b> · موجودی $${b.remaining.toFixed(3)}`;
     }).catch(()=>{});
   }
 }
 
-/* ---------- Actions ---------- */
-async function selectProfile(id){
-  state.activeId=id; localStorage.setItem(LS.active,id);
-  const p=activeProfile();
-  renderProfiles();
-  if(p && !p.models){ await loadModels(p) }
-  renderModels(); renderTopInfo();
-  // open latest conv of this profile or none
-  const list=state.convs.filter(c=>c.profileId===id);
-  state.currentConvId = list.length? list[list.length-1].id : null;
-  renderConvs(); renderChat();
-}
-
-async function loadModels(p){
-  try{ p.models=await fetchModels(p); save(LS.profiles,state.profiles); }
-  catch(e){ toast('خطا در گرفتن مدل‌ها: '+e.message); p.models=[]; }
-}
-
+/* ---------- Profile actions ---------- */
 function fillPresetSelect(selectedUrl){
-  const sel=$('#fPreset');
-  sel.innerHTML='<option value="">— انتخاب از لیست یا «دلخواه» —</option>';
-  PRESETS.forEach((pr,i)=>{
-    const o=document.createElement('option'); o.value=i; o.textContent=pr.name+' ('+pr.url+')';
-    if(pr.url===selectedUrl) o.selected=true;
-    sel.appendChild(o);
-  });
-  const o2=document.createElement('option'); o2.value='custom'; o2.textContent='دلخواه (آدرس دستی)';
-  sel.appendChild(o2);
+  const sel=$('#fPreset'); sel.innerHTML='<option value="">— انتخاب از لیست یا «دلخواه» —</option>';
+  PRESETS.forEach((pr,i)=>{ const o=document.createElement('option'); o.value=i; o.textContent=pr.name+' ('+pr.url+')'; if(pr.url===selectedUrl) o.selected=true; sel.appendChild(o); });
+  const o2=document.createElement('option'); o2.value='custom'; o2.textContent='دلخواه (آدرس دستی)'; sel.appendChild(o2);
 }
 function openProfileModal(id){
   state.editingProfileId=id||null;
-  $('#modalTitle').textContent = id?'ویرایش سرویس':'افزودن سرویس';
+  $('#modalTitle').textContent=id?'ویرایش سرویس':'افزودن سرویس';
   $('#testResult').className='test-result';
-  const p = id? state.profiles.find(x=>x.id===id):null;
+  const p=id?state.profiles.find(x=>x.id===id):null;
   fillPresetSelect(p?baseV1(p.url):'');
   $('#fName').value=p?p.name:''; $('#fUrl').value=p?p.url:''; $('#fKey').value=p?p.key:'';
   $('#profileModal').classList.add('show');
   setTimeout(()=>{ (p?$('#fKey'):$('#fPreset')).focus() },50);
 }
-$('#fPreset').onchange=e=>{
-  const v=e.target.value;
-  if(v==='custom'||v===''){ if(v==='custom'){ $('#fName').value=''; $('#fUrl').value='' } return }
-  const pr=PRESETS[Number(v)];
-  $('#fName').value=pr.name; $('#fUrl').value=pr.url;
-  const res=$('#testResult');
-  if(pr.note){ res.className='test-result ok'; res.textContent=pr.note } else { res.className='test-result' }
-  $('#fKey').focus();
-};
 function closeModal(){ $('#profileModal').classList.remove('show') }
-
 async function saveProfile(){
-  const name=$('#fName').value.trim()||'سرویس';
-  const url=$('#fUrl').value.trim();
-  const key=$('#fKey').value.trim();
+  const name=$('#fName').value.trim()||'سرویس', url=$('#fUrl').value.trim(), key=$('#fKey').value.trim();
   if(!url||!key){ toast('آدرس و کلید الزامی است'); return }
-  if(state.editingProfileId){
-    const p=state.profiles.find(x=>x.id===state.editingProfileId);
-    Object.assign(p,{name,url,key}); delete p.models;
-  }else{
-    state.profiles.push({id:uid(),name,url,key});
-  }
-  save(LS.profiles,state.profiles);
-  closeModal(); renderProfiles();
+  if(state.editingProfileId){ const p=state.profiles.find(x=>x.id===state.editingProfileId); Object.assign(p,{name,url,key}); delete p.models; }
+  else state.profiles.push({id:uid(),name,url,key});
+  save(LS.profiles,state.profiles); closeModal(); renderProfiles();
   await selectProfile(state.editingProfileId||state.profiles[state.profiles.length-1].id);
   toast('ذخیره شد');
 }
-
 function delProfile(id){
   if(!confirm('این سرویس و گفتگوهایش حذف شوند؟')) return;
   state.profiles=state.profiles.filter(p=>p.id!==id);
   state.convs=state.convs.filter(c=>c.profileId!==id);
   save(LS.profiles,state.profiles); save(LS.convs,state.convs);
   if(state.activeId===id){ state.activeId=state.profiles[0]?.id||null; localStorage.setItem(LS.active,state.activeId||'') }
-  renderProfiles(); renderConvs();
-  if(state.activeId) selectProfile(state.activeId); else { renderModels(); renderTopInfo(); renderChat() }
+  renderProfiles();
+  if(state.activeId) selectProfile(state.activeId); else { state.currentConvId=null; renderConvs(); renderModels(); renderTopInfo(); renderChat() }
 }
-
 async function testConnection(){
-  const url=$('#fUrl').value.trim(), key=$('#fKey').value.trim();
-  const res=$('#testResult');
+  const url=$('#fUrl').value.trim(), key=$('#fKey').value.trim(), res=$('#testResult');
   if(!url||!key){ res.className='test-result err'; res.textContent='آدرس و کلید را وارد کنید'; return }
   res.className='test-result'; res.style.display='block'; res.textContent='در حال تست…';
-  try{
-    const models=await fetchModels({url,key});
-    res.className='test-result ok'; res.textContent=`اتصال موفق — ${models.length} مدل یافت شد`;
-  }catch(e){
-    res.className='test-result err';
-    res.textContent='ناموفق: '+e.message+' (احتمال خطای CORS یا کلید/آدرس نادرست)';
-  }
+  try{ const models=await fetchModels({url,key}); res.className='test-result ok'; res.textContent=`اتصال موفق — ${models.length} مدل یافت شد`; }
+  catch(e){ res.className='test-result err'; res.textContent='ناموفق: '+e.message; }
 }
+async function selectProfile(id){
+  state.activeId=id; localStorage.setItem(LS.active,id);
+  const p=activeProfile(); renderProfiles();
+  if(p&&!p.models) await loadModels(p);
+  renderModels(); renderTopInfo();
+  const list=state.convs.filter(c=>c.profileId===id);
+  state.currentConvId=list.length?list[list.length-1].id:null;
+  renderConvs(); renderChat(); syncChatSettings();
+}
+async function loadModels(p){ try{ p.models=await fetchModels(p); save(LS.profiles,state.profiles); } catch(e){ toast('خطا در مدل‌ها: '+e.message); p.models=[]; } }
 
+/* ---------- Conversations ---------- */
 function newChat(){
   if(!state.activeId){ toast('ابتدا یک سرویس انتخاب کنید'); return }
-  const c={id:uid(),profileId:state.activeId,title:'',model:$('#modelSelect').value,messages:[]};
-  state.convs.push(c); save(LS.convs,state.convs);
-  state.currentConvId=c.id;
-  renderConvs(); renderChat(); $('#input').focus(); closeSidebar();
+  const s=state.settings;
+  const c={id:uid(),profileId:state.activeId,title:'',model:$('#modelSelect').value,messages:[],system:'',temperature:s.temperature,maxTokens:s.maxTokens,topP:s.topP};
+  state.convs.push(c); save(LS.convs,state.convs); state.currentConvId=c.id;
+  renderConvs(); renderChat(); syncChatSettings(); $('#input').focus(); closeSidebar();
 }
 function openConv(id){
-  state.currentConvId=id;
-  const c=state.convs.find(x=>x.id===id);
+  state.currentConvId=id; const c=currentConv();
   if(c?.model){ $('#modelSelect').value=c.model }
-  renderConvs(); renderChat(); closeSidebar();
+  renderConvs(); renderChat(); syncChatSettings(); closeSidebar();
 }
-function delConv(id){
-  state.convs=state.convs.filter(c=>c.id!==id); save(LS.convs,state.convs);
-  if(state.currentConvId===id) state.currentConvId=null;
-  renderConvs(); renderChat();
-}
+function delConv(id){ state.convs=state.convs.filter(c=>c.id!==id); save(LS.convs,state.convs); if(state.currentConvId===id) state.currentConvId=null; renderConvs(); renderChat() }
+function renameConv(id){ const c=state.convs.find(x=>x.id===id); if(!c) return; const v=prompt('نام جدید گفتگو:',c.title||''); if(v!==null){ c.title=v.trim()||c.title; save(LS.convs,state.convs); renderConvs() } }
 
+/* ---------- Send / stream ---------- */
+function buildApiMessages(conv){
+  const arr=[]; const sys=(conv.system||'').trim();
+  if(sys) arr.push({role:'system',content:sys});
+  conv.messages.forEach(m=>arr.push({role:m.role,content:m.content}));
+  return arr;
+}
+async function runAssistant(conv){
+  const p=activeProfile(); const model=$('#modelSelect').value;
+  if(!p||!model){ toast('سرویس یا مدل انتخاب نشده'); return }
+  conv.model=model;
+  conv.messages.push({role:'assistant',content:''});
+  renderChat();
+  const inner=$('#chatInner'); const aEl=inner.lastElementChild; const bubble=aEl.querySelector('.bubble');
+  bubble.classList.add('cursor');
+  state.streaming=true; state.abort=new AbortController(); setSendState(true);
+  const body={model,messages:buildApiMessages({...conv,messages:conv.messages.slice(0,-1)}),stream:true,stream_options:{include_usage:true}};
+  if(conv.temperature!=null) body.temperature=conv.temperature;
+  if(conv.topP!=null && conv.topP<1) body.top_p=conv.topP;
+  if(conv.maxTokens) body.max_tokens=conv.maxTokens;
+  let acc=''; const last=()=>conv.messages[conv.messages.length-1];
+  try{
+    await streamChat(p,body,(d)=>{ acc+=d; last().content=acc; bubble.innerHTML=renderMarkdown(acc); scrollDown(); },
+      (u)=>{ last().usage=u; }, state.abort.signal);
+  }catch(e){ if(e.name!=='AbortError'){ acc+=(acc?'\n\n':'')+'⚠️ خطا: '+e.message; last().content=acc; } }
+  bubble.classList.remove('cursor');
+  state.streaming=false; setSendState(false);
+  save(LS.convs,state.convs); renderChat(); renderConvs(); updateBalances();
+}
 async function send(){
   if(state.streaming){ state.abort?.abort(); return }
-  const text=$('#input').value.trim();
-  const p=activeProfile();
+  const text=$('#input').value.trim(); const p=activeProfile();
   if(!p){ toast('یک سرویس انتخاب کنید'); return }
-  if(!text) return;
-  const model=$('#modelSelect').value;
-  if(!model){ toast('یک مدل انتخاب کنید'); return }
+  if(!text && !state.attachments.length) return;
+  if(!$('#modelSelect').value){ toast('یک مدل انتخاب کنید'); return }
   if(!navigator.onLine){ toast('اتصال اینترنت قطع است'); return }
-
-  let conv=state.convs.find(c=>c.id===state.currentConvId);
-  if(!conv){ conv={id:uid(),profileId:p.id,title:'',model,messages:[]}; state.convs.push(conv); state.currentConvId=conv.id }
-  conv.model=model;
-  if(!conv.title){ conv.title=text.slice(0,40) }
-
-  conv.messages.push({role:'user',content:text});
-  $('#input').value=''; autoGrow();
-  renderConvs(); renderChat();
-
-  // assistant placeholder
-  conv.messages.push({role:'assistant',content:''});
-  const inner=$('#chatInner');
-  const aEl=msgEl('assistant',''); inner.appendChild(aEl);
-  const bubble=aEl.querySelector('.bubble'); bubble.classList.add('cursor');
-  scrollDown();
-
-  state.streaming=true; state.abort=new AbortController();
-  setSendState(true);
-  const msgs=conv.messages.slice(0,-1).map(m=>({role:m.role,content:m.content}));
-  let acc='';
-  try{
-    await streamChat(p,model,msgs,(d)=>{
-      acc+=d; conv.messages[conv.messages.length-1].content=acc;
-      bubble.innerHTML=md(acc); scrollDown();
-    },state.abort.signal);
-  }catch(e){
-    if(e.name!=='AbortError'){ acc+=(acc?'\n\n':'')+'⚠️ خطا: '+e.message; conv.messages[conv.messages.length-1].content=acc; bubble.innerHTML=md(acc) }
-  }
-  bubble.classList.remove('cursor');
-  enhanceCode(aEl);
-  state.streaming=false; setSendState(false);
-  save(LS.convs,state.convs); renderConvs(); updateBalances();
+  let conv=currentConv();
+  if(!conv){ const s=state.settings; conv={id:uid(),profileId:p.id,title:'',model:$('#modelSelect').value,messages:[],system:'',temperature:s.temperature,maxTokens:s.maxTokens,topP:s.topP}; state.convs.push(conv); state.currentConvId=conv.id; syncChatSettings(); }
+  if(!conv.title) conv.title=(text||'تصویر').slice(0,40);
+  let content;
+  if(state.attachments.length){ content=[]; if(text) content.push({type:'text',text}); state.attachments.forEach(a=>content.push({type:'image_url',image_url:{url:a.dataUrl}})); }
+  else content=text;
+  conv.messages.push({role:'user',content});
+  $('#input').value=''; state.attachments=[]; renderAttachments(); autoGrow(); updateCharCount();
+  renderConvs();
+  await runAssistant(conv);
 }
-function setSendState(on){
-  $('#sendBtn').textContent = on?'■':'➤';
-  $('#sendBtn').title = on?'توقف':'ارسال';
+function regenerate(i){ const conv=currentConv(); if(!conv) return; conv.messages.splice(i); runAssistant(conv); }
+function setSendState(on){ $('#sendBtn').textContent=on?'■':'➤'; $('#sendBtn').title=on?'توقف':'ارسال'; }
+
+/* ---------- Attachments ---------- */
+function addImages(files){
+  [...files].forEach(f=>{ if(!f.type.startsWith('image/')) return; const r=new FileReader(); r.onload=()=>{ state.attachments.push({dataUrl:r.result}); renderAttachments(); }; r.readAsDataURL(f); });
+}
+function renderAttachments(){
+  const row=$('#attachRow'); row.innerHTML='';
+  if(!state.attachments.length){ row.style.display='none'; return }
+  row.style.display='flex';
+  state.attachments.forEach((a,i)=>{ const d=document.createElement('div'); d.className='att-thumb'; d.innerHTML=`<img src="${a.dataUrl}"><button class="x">✕</button>`; d.querySelector('.x').onclick=()=>{ state.attachments.splice(i,1); renderAttachments() }; row.appendChild(d); });
 }
 
-function renameConv(id){
-  const c=state.convs.find(x=>x.id===id); if(!c) return;
-  const v=prompt('نام جدید گفتگو:', c.title||'');
-  if(v!==null){ c.title=v.trim()||c.title; save(LS.convs,state.convs); renderConvs() }
+/* ---------- Chat settings drawer ---------- */
+function syncChatSettings(){
+  const c=currentConv(); const s=state.settings;
+  const sys=c?c.system||'':'', t=c?c.temperature:s.temperature, mx=c?c.maxTokens:s.maxTokens, tp=c?c.topP:s.topP;
+  $('#csSystem').value=sys; $('#csTemp').value=t; $('#csTempVal').textContent=t;
+  $('#csMax').value=mx||0; $('#csTopP').value=tp; $('#csTopPVal').textContent=tp;
+}
+function applyChatSettings(){
+  const c=currentConv();
+  const t=parseFloat($('#csTemp').value), mx=parseInt($('#csMax').value)||0, tp=parseFloat($('#csTopP').value), sys=$('#csSystem').value;
+  $('#csTempVal').textContent=t; $('#csTopPVal').textContent=tp;
+  if(c){ c.system=sys; c.temperature=t; c.maxTokens=mx; c.topP=tp; save(LS.convs,state.convs); }
+  state.settings={temperature:t,maxTokens:mx,topP:tp}; save(LS.settings,state.settings);
 }
 
 /* ---------- Export / Backup ---------- */
-function download(filename, text, type){
-  const blob=new Blob([text],{type:type||'text/plain;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=filename;
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000);
-}
+function download(filename,text,type){ const b=new Blob([text],{type:type||'text/plain;charset=utf-8'}); const a=document.createElement('a'); a.href=URL.createObjectURL(b); a.download=filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(a.href),1000); }
 function exportConv(id){
-  const c=state.convs.find(x=>x.id===id); if(!c) return;
-  const prof=state.profiles.find(p=>p.id===c.profileId);
-  let md='# '+(c.title||'گفتگو')+'\n\n';
-  md+=`> سرویس: ${prof?prof.name:'-'} · مدل: ${c.model||'-'}\n\n`;
-  c.messages.forEach(m=>{ md+=`**${m.role==='user'?'کاربر':'دستیار'}:**\n\n${m.content}\n\n---\n\n` });
+  const c=state.convs.find(x=>x.id===id); if(!c) return; const prof=state.profiles.find(p=>p.id===c.profileId);
+  let md='# '+(c.title||'گفتگو')+'\n\n> سرویس: '+(prof?prof.name:'-')+' · مدل: '+(c.model||'-')+'\n\n';
+  if(c.system) md+='**System:** '+c.system+'\n\n';
+  c.messages.forEach(m=>{ md+='**'+(m.role==='user'?'کاربر':'دستیار')+':**\n\n'+msgText(m.content)+'\n\n---\n\n'; });
   const safe=(c.title||'chat').replace(/[^\w؀-ۿ\- ]/g,'').slice(0,40)||'chat';
-  download(safe+'.md', md, 'text/markdown;charset=utf-8');
+  download(safe+'.md',md,'text/markdown;charset=utf-8');
 }
-function exportAll(){
-  const data={app:'NewAPI Chat',version:APP_VERSION,exportedAt:new Date().toISOString(),
-    profiles:state.profiles, convs:state.convs};
-  download('newapi-backup-'+new Date().toISOString().slice(0,10)+'.json',
-    JSON.stringify(data,null,2),'application/json');
-  toast('بکاپ دانلود شد');
-}
+function exportAll(){ download('newapi-backup-'+new Date().toISOString().slice(0,10)+'.json',JSON.stringify({app:'NewAPI Chat',version:APP_VERSION,exportedAt:new Date().toISOString(),profiles:state.profiles,convs:state.convs,settings:state.settings},null,2),'application/json'); toast('بکاپ دانلود شد'); }
 function importAll(file){
   const r=new FileReader();
-  r.onload=()=>{
-    try{
-      const d=JSON.parse(r.result);
-      if(!Array.isArray(d.profiles)) throw 0;
-      if(!confirm('داده‌های فعلی با محتوای فایل جایگزین شوند؟')) return;
-      state.profiles=d.profiles||[]; state.convs=Array.isArray(d.convs)?d.convs:[];
-      state.profiles.forEach(p=>{ delete p.models });
-      save(LS.profiles,state.profiles); save(LS.convs,state.convs);
-      state.activeId=state.profiles[0]?.id||null; localStorage.setItem(LS.active,state.activeId||'');
-      state.currentConvId=null;
-      closeSettings(); renderProfiles();
-      if(state.activeId) selectProfile(state.activeId); else { renderConvs(); renderChat(); renderModels(); renderTopInfo() }
-      toast('بازیابی شد');
-    }catch{ toast('فایل نامعتبر است') }
-  };
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(!Array.isArray(d.profiles)) throw 0; if(!confirm('داده‌های فعلی با محتوای فایل جایگزین شوند؟')) return;
+    state.profiles=d.profiles||[]; state.convs=Array.isArray(d.convs)?d.convs:[]; if(d.settings) state.settings=d.settings;
+    state.profiles.forEach(p=>delete p.models); save(LS.profiles,state.profiles); save(LS.convs,state.convs); save(LS.settings,state.settings);
+    state.activeId=state.profiles[0]?.id||null; localStorage.setItem(LS.active,state.activeId||''); state.currentConvId=null;
+    closeSettings(); renderProfiles(); if(state.activeId) selectProfile(state.activeId); else { renderConvs(); renderChat(); renderModels(); renderTopInfo() } toast('بازیابی شد');
+  }catch{ toast('فایل نامعتبر است') } };
   r.readAsText(file);
 }
 function clearAll(){
-  if(!confirm('همه‌ی سرویس‌ها، کلیدها و گفتگوها پاک شوند؟ این عمل برگشت‌پذیر نیست.')) return;
-  [LS.profiles,LS.active,LS.convs].forEach(k=>localStorage.removeItem(k));
+  if(!confirm('همه‌ی سرویس‌ها، کلیدها و گفتگوها پاک شوند؟ برگشت‌پذیر نیست.')) return;
+  [LS.profiles,LS.active,LS.convs,LS.settings].forEach(k=>localStorage.removeItem(k));
   Object.keys(localStorage).filter(k=>k.startsWith(LS.model)).forEach(k=>localStorage.removeItem(k));
-  state.profiles=[]; state.convs=[]; state.activeId=null; state.currentConvId=null;
-  closeSettings(); renderProfiles(); renderConvs(); renderModels(); renderTopInfo(); renderChat();
-  toast('همه‌چیز پاک شد');
+  state.profiles=[]; state.convs=[]; state.activeId=null; state.currentConvId=null; state.settings={temperature:0.7,maxTokens:0,topP:1};
+  closeSettings(); renderProfiles(); renderConvs(); renderModels(); renderTopInfo(); renderChat(); toast('همه‌چیز پاک شد');
 }
 
-/* ---------- Theme ---------- */
+/* ---------- Theme / Settings / Offline ---------- */
 function applyTheme(t){
-  document.documentElement.setAttribute('data-theme',t);
-  localStorage.setItem(LS.theme,t);
-  document.querySelector('meta[name=theme-color]').setAttribute('content', t==='light'?'#ffffff':'#0f1117');
+  document.documentElement.setAttribute('data-theme',t); localStorage.setItem(LS.theme,t);
+  document.querySelector('meta[name=theme-color]').setAttribute('content',t==='light'?'#ffffff':'#0e1016');
   document.querySelectorAll('#themeSeg button').forEach(b=>b.classList.toggle('on',b.dataset.themeVal===t));
+  const hl=$('#hljsTheme'); if(hl) hl.href='https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/'+(t==='light'?'github':'github-dark')+'.min.css';
 }
-
-/* ---------- Settings modal ---------- */
 function openSettings(){ applyTheme(localStorage.getItem(LS.theme)||'dark'); $('#settingsModal').classList.add('show') }
 function closeSettings(){ $('#settingsModal').classList.remove('show') }
-
-/* ---------- Offline ---------- */
-function updateOnline(){ $('#offlineBanner').classList.toggle('show', !navigator.onLine) }
+function updateOnline(){ $('#offlineBanner').classList.toggle('show',!navigator.onLine) }
 
 /* ---------- UI plumbing ---------- */
-function autoGrow(){ const t=$('#input'); t.style.height='auto'; t.style.height=Math.min(t.scrollHeight,180)+'px' }
+function autoGrow(){ const t=$('#input'); t.style.height='auto'; t.style.height=Math.min(t.scrollHeight,200)+'px' }
+function updateCharCount(){ const n=$('#input').value.length; $('#charCount').textContent=n?n+' نویسه':''; }
 function openSidebar(){ $('#sidebar').classList.add('open'); $('#scrim').classList.add('show') }
 function closeSidebar(){ $('#sidebar').classList.remove('open'); $('#scrim').classList.remove('show') }
+function renderSuggestions(){ const el=$('#sugs'); el.innerHTML=''; SUGGESTIONS.forEach(s=>{ const d=document.createElement('div'); d.className='sug'; d.textContent=s; d.onclick=()=>{ $('#input').value=s; autoGrow(); updateCharCount(); $('#input').focus(); }; el.appendChild(d); }); }
 
 $('#addProfileBtn').onclick=()=>openProfileModal();
 $('#welcomeAddBtn').onclick=()=>openProfileModal();
 $('#closeModalBtn').onclick=closeModal;
 $('#saveProfileBtn').onclick=saveProfile;
 $('#testBtn').onclick=testConnection;
+$('#fPreset').onchange=e=>{ const v=e.target.value; if(v==='custom'){ $('#fName').value=''; $('#fUrl').value=''; return } if(v===''){ return } const pr=PRESETS[Number(v)]; $('#fName').value=pr.name; $('#fUrl').value=pr.url; const res=$('#testResult'); if(pr.note){ res.className='test-result '+(pr.note.startsWith('⚠️')?'err':'ok'); res.textContent=pr.note } else res.className='test-result'; $('#fKey').focus(); };
 $('#newChatBtn').onclick=newChat;
 $('#hambBtn').onclick=openSidebar;
 $('#scrim').onclick=closeSidebar;
 $('#reloadModelsBtn').onclick=async()=>{ const p=activeProfile(); if(p){ await loadModels(p); renderModels(); toast('مدل‌ها بروزرسانی شد') } };
-$('#modelSelect').onchange=e=>{ const p=activeProfile(); if(p) localStorage.setItem(LS.model+p.id,e.target.value) };
+$('#modelSelect').onchange=e=>{ const p=activeProfile(); if(p) localStorage.setItem(LS.model+p.id,e.target.value); const c=currentConv(); if(c){ c.model=e.target.value; save(LS.convs,state.convs) } };
+$('#chatSettingsBtn').onclick=()=>{ const d=$('#chatSettings'); d.classList.toggle('show'); $('#chatSettingsBtn').classList.toggle('on',d.classList.contains('show')); };
+['csSystem','csTemp','csMax','csTopP'].forEach(id=>$('#'+id).addEventListener('input',applyChatSettings));
 $('#sendBtn').onclick=send;
-$('#input').addEventListener('input',autoGrow);
-$('#input').addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); send() }
-});
-$('#profileModal').addEventListener('click',e=>{ if(e.target.id==='profileModal') closeModal() });
-
-// settings
+$('#attachBtn').onclick=()=>$('#imgFile').click();
+$('#imgFile').onchange=e=>{ addImages(e.target.files); e.target.value=''; };
+$('#convSearch').addEventListener('input',e=>{ state.convFilter=e.target.value; renderConvs(); });
+$('#input').addEventListener('input',()=>{ autoGrow(); updateCharCount(); });
+$('#input').addEventListener('keydown',e=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); send() } });
+$('#input').addEventListener('paste',e=>{ const items=e.clipboardData?.items||[]; const imgs=[...items].filter(it=>it.type.startsWith('image/')); if(imgs.length){ addImages(imgs.map(it=>it.getAsFile())); } });
 $('#settingsBtn').onclick=openSettings;
 $('#closeSettingsBtn').onclick=closeSettings;
 $('#settingsModal').addEventListener('click',e=>{ if(e.target.id==='settingsModal') closeSettings() });
+$('#profileModal').addEventListener('click',e=>{ if(e.target.id==='profileModal') closeModal() });
 $('#themeSeg').addEventListener('click',e=>{ const b=e.target.closest('button'); if(b) applyTheme(b.dataset.themeVal) });
 $('#exportAllBtn').onclick=exportAll;
 $('#importAllBtn').onclick=()=>$('#importFile').click();
-$('#importFile').onchange=e=>{ if(e.target.files[0]) importAll(e.target.files[0]); e.target.value='' };
+$('#importFile').onchange=e=>{ if(e.target.files[0]) importAll(e.target.files[0]); e.target.value=''; };
 $('#clearAllBtn').onclick=clearAll;
-window.addEventListener('online',updateOnline);
-window.addEventListener('offline',updateOnline);
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ closeModal(); closeSettings(); } });
+window.addEventListener('online',updateOnline); window.addEventListener('offline',updateOnline);
 
 /* ---------- Init ---------- */
 function init(){
   applyTheme(localStorage.getItem(LS.theme)||'dark');
-  updateOnline();
-  renderProfiles();
-  if(state.activeId && activeProfile()){ selectProfile(state.activeId) }
-  else { renderConvs(); renderChat() }
-  $('#hint').textContent='داده‌ها فقط روی همین دستگاه ذخیره می‌شوند.';
-  if('serviceWorker' in navigator){ navigator.serviceWorker.register('sw.js').catch(()=>{}) }
+  updateOnline(); renderSuggestions(); renderProfiles();
+  if(state.activeId&&activeProfile()) selectProfile(state.activeId); else { renderConvs(); renderChat() }
+  syncChatSettings();
+  $('#hint').textContent='Enter ارسال · Shift+Enter خط جدید';
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
 }
 init();
 </script>
