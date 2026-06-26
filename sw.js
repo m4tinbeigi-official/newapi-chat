@@ -1,5 +1,5 @@
 /* NewAPI Chat — service worker (app-shell cache) */
-const CACHE = 'newapi-chat-v4';
+const CACHE = 'newapi-chat-v5';
 const SHELL = [
   './',
   './index.html',

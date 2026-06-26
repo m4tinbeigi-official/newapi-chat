@@ -67,11 +67,9 @@ python3 -m http.server 8000
 ۲. کد داخل `cloudflare-worker.js` را جای‌گذاری کن و **Deploy** بزن.
 ۳. (اختیاری) در آرایه‌ی `ALLOW_HOSTS` هاست سرورهای خودت را اضافه کن.
 ۴. آدرس Worker را بردار (مثل `https://newapi.<user>.workers.dev`).
-۵. در اپ، هنگام افزودن/ویرایش سرویس، در فیلد **CORS Proxy** این را بگذار:
-   ```
-   https://newapi.<user>.workers.dev/?url={url}
-   ```
+۵. در اپ، فیلد **CORS Proxy** را با این قالب پر کن: `https://<your-worker>.workers.dev/?url={url}`
 
+> پراکسی پیش‌فرض اپ روی `https://agentrouter.m4tinbeigi.workers.dev/?url={url}` تنظیم شده و هرکسی می‌تواند آن را در **تنظیمات → CORS Proxy پیش‌فرض** عوض کند و Worker خودش را بسازد (سورس: `cloudflare-worker.js`). با انتخاب پریست AgentRouter، این پراکسی خودکار پر می‌شود.
 > اپ خودش `{url}` را با آدرس مقصد encode‌شده جایگزین می‌کند. استریم چت حفظ می‌شود.
 > اگر AgentRouter بعد از Worker هم صفحه‌ی WAF داد، یعنی WAF حتی IP کلودفلر را هم چالش می‌کند؛ در آن صورت فقط نسخه‌ی نیتیو جواب می‌دهد.
 

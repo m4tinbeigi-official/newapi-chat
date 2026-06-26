@@ -297,7 +297,7 @@
       <div class="field"><label>نام دلخواه</label><input id="fName" placeholder="مثلاً AgentRouter" /></div>
       <div class="field"><label>آدرس سرور (Base URL)</label><input id="fUrl" placeholder="https://api.bluesminds.com" dir="ltr" /></div>
       <div class="field"><label>کلید وب‌سرویس (API Key)</label><input id="fKey" placeholder="sk-..." dir="ltr" type="password" /></div>
-      <div class="field"><label>CORS Proxy (اختیاری) <span style="color:var(--muted)">— برای سرورهایی که CORS نمی‌دهند</span></label><input id="fProxy" placeholder="https://proxy.example/?url={url}" dir="ltr" /></div>
+      <div class="field"><label>CORS Proxy (اختیاری) <span style="color:var(--muted)">— برای WAF/CORS · <a href="cloudflare-worker.js" target="_blank" style="color:var(--accent)">سورس Worker</a></span></label><input id="fProxy" placeholder="https://...workers.dev/?url={url}" dir="ltr" /></div>
       <div class="test-result" id="testResult"></div>
       <div class="muted-note">آدرس را بدون <code>/v1</code> وارد کنید. اگر پراکسی <code>{url}</code> داشته باشد، آدرس مقصد به‌صورت encode‌شده جایگزین می‌شود؛ وگرنه به ابتدای آدرس اضافه می‌شود. کلید/آدرس فقط روی همین دستگاه ذخیره می‌شوند.</div>
     </div>
@@ -740,7 +740,8 @@ $('#welcomeAddBtn').onclick=()=>openProfileModal();
 $('#closeModalBtn').onclick=closeModal;
 $('#saveProfileBtn').onclick=saveProfile;
 $('#testBtn').onclick=testConnection;
-$('#fPreset').onchange=e=>{ const v=e.target.value; if(v==='custom'){ $('#fName').value=''; $('#fUrl').value=''; return } if(v===''){ return } const pr=PRESETS[Number(v)]; $('#fName').value=pr.name; $('#fUrl').value=pr.url; const res=$('#testResult'); if(pr.note){ res.className='test-result '+(pr.note.startsWith('⚠️')?'err':'ok'); res.textContent=pr.note } else res.className='test-result'; $('#fKey').focus(); };
+$('#fPreset').onchange=e=>{ const v=e.target.value; if(v==='custom'){ $('#fName').value=''; $('#fUrl').value=''; $('#fProxy').value=''; return } if(v===''){ return } const pr=PRESETS[Number(v)]; $('#fName').value=pr.name; $('#fUrl').value=pr.url; $('#fProxy').value=pr.useProxy?(state.settings.defaultProxy||DEFAULT_PROXY):''; const res=$('#testResult'); if(pr.note){ res.className='test-result ok'; res.textContent=pr.note } else res.className='test-result'; $('#fKey').focus(); };
+$('#setProxy').addEventListener('input',e=>{ state.settings.defaultProxy=e.target.value.trim(); save(LS.settings,state.settings); });
 $('#newChatBtn').onclick=newChat;
 $('#hambBtn').onclick=openSidebar;
 $('#scrim').onclick=closeSidebar;
@@ -769,6 +770,7 @@ window.addEventListener('online',updateOnline); window.addEventListener('offline
 
 /* ---------- Init ---------- */
 function init(){
+  if(state.settings.defaultProxy==null){ state.settings.defaultProxy=DEFAULT_PROXY; save(LS.settings,state.settings); }
   applyTheme(localStorage.getItem(LS.theme)||'dark');
   updateOnline(); renderSuggestions(); renderProfiles();
   if(state.activeId&&activeProfile()) selectProfile(state.activeId); else { renderConvs(); renderChat() }
